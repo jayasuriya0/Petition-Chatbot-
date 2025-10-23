@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Settings | Department Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            display: flex;
+        }
+        
+        /* Sidebar - Same as other pages */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .dept-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 0;
+        }
+        
+        .dept-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .dept-details h3 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .dept-details p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--success);
+        }
+        
+        .menu-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        .top-bar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-title h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .page-title p {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 0.2rem;
+        }
+        
+        .content {
+            padding: 2rem;
+            max-width: 1200px;
+        }
+        
+        /* Settings Sections */
+        .settings-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .section-header i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .section-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        /* Toggle Switch */
+        .toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .toggle-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+            color: var(--dark);
+        }
+        
+        .toggle-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        /* Team Members */
+        .team-list {
+            margin-top: 1rem;
+        }
+        
+        .team-member {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .member-details h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .member-details p {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .member-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Alert Box */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-info {
+            background: rgba(67, 97, 238, 0.1);
+            border-left: 4px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .alert-warning {
+            background: rgba(248, 150, 30, 0.1);
+            border-left: 4px solid var(--warning);
+            color: var(--warning);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <h1 id="dept-name">Department</h1>
+            </div>
+        </div>
+        
+        <div class="dept-info">
+            <div class="dept-avatar" id="dept-avatar">D</div>
+            <div class="dept-details">
+                <h3 id="dept-full-name">Department Name</h3>
+                <p>Department Staff</p>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="department-dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="assigned-petitions.html" class="menu-item">
+                <i class="fas fa-list"></i>
+                <span>Assigned Petitions</span>
+            </a>
+            <a href="department-analytics.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Department Analytics</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="department-settings.html" class="menu-item active">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" class="menu-item" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="page-title">
+                <h2><i class="fas fa-cog"></i> Department Settings</h2>
+                <p>Manage your department preferences and configurations</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Department Information -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-building"></i>
+                    <h3>Department Information</h3>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dept-name-input">Department Name</label>
+                        <input type="text" id="dept-name-input" value="Public Works Department" placeholder="Enter department name" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                        <div class="form-help">Department name cannot be changed</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dept-email">Contact Email</label>
+                        <input type="email" id="dept-email" value="publicworks@example.com" placeholder="department@example.com" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                        <div class="form-help">Contact email cannot be changed</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dept-phone">Contact Phone</label>
+                        <input type="tel" id="dept-phone" value="+1 234 567 8900" placeholder="+1 234 567 8900">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dept-location">Office Location</label>
+                        <input type="text" id="dept-location" value="Building A, Floor 3" placeholder="Enter office location">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dept-description">Department Description</label>
+                    <textarea id="dept-description" placeholder="Briefly describe your department's responsibilities...">Responsible for maintaining and improving public infrastructure including roads, bridges, water systems, and public facilities.</textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-outline">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Notification Preferences -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-bell"></i>
+                    <h3>Notification Preferences</h3>
+                </div>
+                
+                <div class="toggle-group">
+                    <div class="toggle-info">
+                        <h4>New Petition Alerts</h4>
+                        <p>Receive instant notifications when a new petition is assigned</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="toggle-group">
+                    <div class="toggle-info">
+                        <h4>Priority Petition Alerts</h4>
+                        <p>Get notified immediately for high-priority petitions</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="toggle-group">
+                    <div class="toggle-info">
+                        <h4>Daily Summary Email</h4>
+                        <p>Receive a daily digest of all petition activities</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="toggle-group">
+                    <div class="toggle-info">
+                        <h4>Weekly Performance Report</h4>
+                        <p>Get weekly analytics and performance metrics</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Settings saved successfully</span>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+        });
+        
+        function loadSettings() {
+            fetch('/api/department/settings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showToast(data.error, 'error');
+                        return;
+                    }
+                    
+                    // Department Information (read-only fields)
+                    document.getElementById('dept-name-input').value = data.department.name || '';
+                    document.getElementById('dept-email').value = data.department.email || '';
+                    document.getElementById('dept-phone').value = data.department.phone || '';
+                    document.getElementById('dept-location').value = data.department.location || '';
+                    document.getElementById('dept-description').value = data.department.description || '';
+                    
+                    // Notifications
+                    const notifications = data.notifications || {};
+                    document.querySelectorAll('.toggle-group input[type="checkbox"]')[0].checked = 
+                        notifications.new_petition_alerts !== false;
+                    document.querySelectorAll('.toggle-group input[type="checkbox"]')[1].checked = 
+                        notifications.priority_alerts !== false;
+                    document.querySelectorAll('.toggle-group input[type="checkbox"]')[2].checked = 
+                        notifications.daily_summary === true;
+                    document.querySelectorAll('.toggle-group input[type="checkbox"]')[3].checked = 
+                        notifications.weekly_report !== false;
+                })
+                .catch(error => {
+                    console.error('Error loading settings:', error);
+                    showToast('Failed to load settings', 'error');
+                });
+        }
+        
+        function saveSettings() {
+            const settings = {
+                department: {
+                    phone: document.getElementById('dept-phone').value,
+                    location: document.getElementById('dept-location').value,
+                    description: document.getElementById('dept-description').value
+                },
+                notifications: {
+                    new_petition_alerts: document.querySelectorAll('.toggle-group input[type="checkbox"]')[0].checked,
+                    priority_alerts: document.querySelectorAll('.toggle-group input[type="checkbox"]')[1].checked,
+                    daily_summary: document.querySelectorAll('.toggle-group input[type="checkbox"]')[2].checked,
+                    weekly_report: document.querySelectorAll('.toggle-group input[type="checkbox"]')[3].checked
+                }
+            };
+            
+            fetch('/api/department/settings', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error, 'error');
+                } else {
+                    showToast('Settings saved successfully!', 'success');
+                    loadSettings(); // Reload to confirm
+                }
+            })
+            .catch(error => {
+                console.error('Error saving settings:', error);
+                showToast('Failed to save settings', 'error');
+            });
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            window.location.href = '/logout';
+        });
+    </script>
+</body>
+</html>

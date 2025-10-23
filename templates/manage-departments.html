@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Departments | Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .section-header h2 {
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background-color: var(--light);
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-info {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h3 {
+            color: var(--dark);
+        }
+        
+        .close {
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: var(--danger);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-error {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-building"></i>
+                Manage Departments
+            </h1>
+            <a href="admin-dashboard.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div id="alert-message" class="alert"></div>
+
+        <div class="content-section">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-list"></i>
+                    All Departments
+                </h2>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    <i class="fas fa-plus"></i> Add New Department
+                </button>
+            </div>
+
+            <table id="departments-table">
+                <thead>
+                    <tr>
+                        <th>Department Name</th>
+                        <th>Email</th>
+                        <th>Total Petitions</th>
+                        <th>Resolved</th>
+                        <th>Pending</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="departments-tbody">
+                    <!-- Departments will be loaded here -->
+                </tbody>
+            </table>
+
+            <div id="empty-state" class="empty-state">
+                <i class="fas fa-building"></i>
+                <h3>No Departments Yet</h3>
+                <p>Click "Add New Department" to create your first department</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Modal -->
+    <div id="department-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Add New Department</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="department-form">
+                <div class="form-group">
+                    <label for="dept-name">Department Name *</label>
+                    <input type="text" id="dept-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="dept-email">Email *</label>
+                    <input type="email" id="dept-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="dept-password">Password *</label>
+                    <input type="password" id="dept-password" required placeholder="Enter secure password">
+                </div>
+                <div class="form-group">
+                    <label for="dept-categories">Categories (Optional)</label>
+                    <input type="text" id="dept-categories" placeholder="e.g., Infrastructure, Roads, Water">
+                    <small>Separate multiple categories with commas</small>
+                </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        <i class="fas fa-save"></i> Save Department
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading">
+        <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <script>
+        const API_CONFIG = {
+            API_BASE_URL: window.location.origin
+        };
+
+        let departments = [];
+        let allPetitions = [];
+        let editingDepartmentId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            await loadDepartments();
+            await loadPetitions();
+            displayDepartments();
+        });
+        
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_CONFIG.API_BASE_URL}/api/check-auth`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (!data.authenticated || data.user_type !== 'admin') {
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+        
+        async function loadDepartments() {
+            const loading = document.getElementById('loading');
+            loading.classList.add('show');
+            
+            try {
+                const response = await fetch(`${API_CONFIG.API_BASE_URL}/api/admin/departments`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    departments = data.departments;
+                } else {
+                    showAlert('Failed to load departments', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading departments:', error);
+                showAlert('Network error. Please try again.', 'error');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+        
+        async function loadPetitions() {
+            try {
+                const response = await fetch(`${API_CONFIG.API_BASE_URL}/api/admin/petitions`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    allPetitions = data.petitions;
+                }
+            } catch (error) {
+                console.error('Error loading petitions:', error);
+            }
+        }
+        
+        function getPetitionStats(departmentName) {
+            const deptPetitions = allPetitions.filter(p => 
+                p.department && p.department.toLowerCase() === departmentName.toLowerCase()
+            );
+            
+            return {
+                total: deptPetitions.length,
+                solved: deptPetitions.filter(p => p.status === 'resolved').length,
+                pending: deptPetitions.filter(p => p.status === 'pending' || p.status === 'in_progress').length
+            };
+        }
+        
+        function displayDepartments() {
+            const tbody = document.getElementById('departments-tbody');
+            const emptyState = document.getElementById('empty-state');
+            const table = document.getElementById('departments-table');
+            
+            if (departments.length === 0) {
+                table.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            table.style.display = 'table';
+            emptyState.style.display = 'none';
+            tbody.innerHTML = '';
+            
+            departments.forEach(dept => {
+                const stats = getPetitionStats(dept.name);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${dept.name}</strong></td>
+                    <td>${dept.email}</td>
+                    <td><span class="badge badge-info">${stats.total}</span></td>
+                    <td><span class="badge badge-success">${stats.solved}</span></td>
+                    <td><span class="badge badge-warning">${stats.pending}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="openEditModal('${dept._id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteDepartment('${dept._id}', '${dept.name}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function openCreateModal() {
+            editingDepartmentId = null;
+            document.getElementById('modal-title').textContent = 'Add New Department';
+            document.getElementById('department-form').reset();
+            document.getElementById('dept-password').required = true;
+            document.getElementById('department-modal').classList.add('show');
+        }
+        
+        function openEditModal(deptId) {
+            editingDepartmentId = deptId;
+            const dept = departments.find(d => d._id === deptId);
+            
+            if (dept) {
+                document.getElementById('modal-title').textContent = 'Edit Department';
+                document.getElementById('dept-name').value = dept.name;
+                document.getElementById('dept-email').value = dept.email;
+                document.getElementById('dept-password').value = '';
+                document.getElementById('dept-password').required = false;
+                document.getElementById('dept-password').placeholder = 'Leave blank to keep current password';
+                document.getElementById('dept-categories').value = dept.categories ? dept.categories.join(', ') : '';
+                document.getElementById('department-modal').classList.add('show');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('department-modal').classList.remove('show');
+            document.getElementById('department-form').reset();
+            document.getElementById('dept-password').required = true;
+            document.getElementById('dept-password').placeholder = 'Enter secure password';
+            editingDepartmentId = null;
+        }
+        
+        document.getElementById('department-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            const name = document.getElementById('dept-name').value.trim();
+            const email = document.getElementById('dept-email').value.trim();
+            const password = document.getElementById('dept-password').value;
+            const categoriesStr = document.getElementById('dept-categories').value.trim();
+            const categories = categoriesStr ? categoriesStr.split(',').map(c => c.trim()).filter(c => c) : [];
+            
+            const data = {
+                name,
+                email,
+                categories
+            };
+            
+            // Only include password if it's provided (for edits) or required (for creates)
+            if (password || !editingDepartmentId) {
+                data.password = password;
+            }
+            
+            try {
+                let response;
+                if (editingDepartmentId) {
+                    // Update existing department
+                    response = await fetch(`${API_CONFIG.API_BASE_URL}/api/admin/departments/${editingDepartmentId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    // Create new department
+                    response = await fetch(`${API_CONFIG.API_BASE_URL}/api/admin/departments`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert(editingDepartmentId ? 'Department updated successfully!' : 'Department created successfully!', 'success');
+                    closeModal();
+                    await loadDepartments();
+                    displayDepartments();
+                } else {
+                    showAlert(result.error || 'Failed to save department', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving department:', error);
+                showAlert('Network error. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Department';
+            }
+        });
+        
+        async function deleteDepartment(deptId, deptName) {
+            if (!confirm(`Are you sure you want to delete "${deptName}"?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_CONFIG.API_BASE_URL}/api/admin/departments/${deptId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert('Department deleted successfully!', 'success');
+                    await loadDepartments();
+                    displayDepartments();
+                } else {
+                    showAlert(data.error || 'Failed to delete department', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting department:', error);
+                showAlert('Network error. Please try again.', 'error');
+            }
+        }
+        
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert-message');
+            alert.textContent = message;
+            alert.className = `alert alert-${type} show`;
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

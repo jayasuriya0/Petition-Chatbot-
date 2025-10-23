@@ -1,0 +1,2589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Petition Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='department-management.js') }}" defer></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --sidebar-width: 280px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            display: flex;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 0;
+        }
+        
+        .admin-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .admin-details h3 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .admin-details p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--success);
+        }
+        
+        .menu-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .page-title h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 300px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card:hover::after {
+            opacity: 0.3;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-gradient-start), var(--card-gradient-end));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-icon::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 16px;
+            background: inherit;
+            filter: blur(8px);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card:hover .stat-icon::after {
+            opacity: 0.6;
+        }
+        
+        .stat-info {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-info h3 {
+            font-size: 2.2rem;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+            color: var(--dark);
+            transition: all 0.3s ease, opacity 0.2s ease;
+        }
+        
+        .stat-card:hover .stat-info h3 {
+            transform: scale(1.05);
+            color: var(--card-gradient-end);
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        /* Individual card colors */
+        .stat-total {
+            --card-gradient-start: #4361ee;
+            --card-gradient-end: #3a0ca3;
+        }
+        
+        .stat-pending {
+            --card-gradient-start: #f8961e;
+            --card-gradient-end: #f3722c;
+        }
+        
+        .stat-progress {
+            --card-gradient-start: #4cc9f0;
+            --card-gradient-end: #4895ef;
+        }
+        
+        .stat-resolved {
+            --card-gradient-start: #7209b7;
+            --card-gradient-end: #560bad;
+        }
+        
+        .stat-total .stat-icon { background: linear-gradient(135deg, #4361ee, #3a0ca3); }
+        .stat-pending .stat-icon { background: linear-gradient(135deg, #f8961e, #f3722c); }
+        .stat-progress .stat-icon { background: linear-gradient(135deg, #4cc9f0, #4895ef); }
+        .stat-resolved .stat-icon { background: linear-gradient(135deg, #7209b7, #560bad); }
+        
+        /* Add loading animation for stat numbers */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .stat-info h3 {
+            animation: fadeInScale 0.5s ease-out;
+        }
+        
+        .stat-info h3.loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .chart-actions select {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        /* Tables */
+        .table-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-in-progress {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-resolved {
+            background: rgba(5, 150, 105, 0.1);
+            color: #059669;
+        }
+        
+        .status-rejected {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .view-btn {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+        }
+        
+        .view-btn:hover {
+            background: linear-gradient(135deg, #3a56d4, #2d0a83);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+        }
+        
+        /* Deadline styles */
+        .deadline-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .deadline-timer {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .deadline-timer.overdue {
+            color: var(--danger);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .deadline-timer.critical {
+            color: var(--warning);
+        }
+        
+        .deadline-timer.normal {
+            color: var(--success);
+        }
+        
+        .deadline-date {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .urgency-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .urgency-critical {
+            background: linear-gradient(135deg, #ff006e, #d90429);
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 0, 110, 0.3);
+        }
+        
+        .urgency-high {
+            background: linear-gradient(135deg, #f8961e, #f3722c);
+            color: white;
+            box-shadow: 0 2px 8px rgba(248, 150, 30, 0.3);
+        }
+        
+        .urgency-medium {
+            background: linear-gradient(135deg, #4cc9f0, #4895ef);
+            color: white;
+            box-shadow: 0 2px 8px rgba(76, 201, 240, 0.3);
+        }
+        
+        .urgency-low {
+            background: linear-gradient(135deg, #90e0ef, #00b4d8);
+            color: white;
+            box-shadow: 0 2px 8px rgba(144, 224, 239, 0.3);
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+        
+        .edit-btn {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .edit-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .delete-btn {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border);
+        }
+        
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.95), rgba(114, 9, 183, 0.95));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .loading-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        .loading-spinner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+        }
+        
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+        
+        .spinner-ring:nth-child(1) {
+            border-top-color: #fff;
+            border-right-color: #fff;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner-ring:nth-child(2) {
+            border-bottom-color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(255, 255, 255, 0.6);
+            animation: spin 2s linear infinite reverse;
+        }
+        
+        .spinner-ring:nth-child(3) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-top-color: rgba(255, 255, 255, 0.4);
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+        
+        /* Filter Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .modal-header h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            color: var(--danger);
+            background: rgba(247, 37, 133, 0.1);
+        }
+        
+        .modal-body {
+            padding: 1rem 0;
+        }
+        
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .filter-group select, 
+        .filter-group input, 
+        .filter-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus,
+        .filter-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .filter-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .filter-group small {
+            display: block;
+            margin-top: 0.5rem;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        /* Petition Details Styles */
+        .petition-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-row.full-width {
+            grid-template-columns: 1fr;
+        }
+        
+        .detail-row strong {
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .detail-row span, .detail-row p {
+            color: var(--gray);
+        }
+        
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Department Profile Styles */
+        .department-profile-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .profile-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .profile-section:last-of-type {
+            border-bottom: none;
+        }
+        
+        .profile-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        
+        .info-item label {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        .info-item span {
+            color: var(--dark);
+            font-size: 1rem;
+        }
+        
+        .categories-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .category-badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .description-box {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 80px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card i {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+        
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .logo h1,
+            .sidebar .admin-details,
+            .sidebar .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box input {
+                width: 200px;
+            }
+            
+            .top-bar {
+                padding: 1rem;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-file-signature"></i>
+                <h1>Petition System</h1>
+            </div>
+        </div>
+        
+        <div class="admin-info">
+            <div class="admin-avatar" id="admin-avatar">A</div>
+            <div class="admin-details">
+                <h3 id="admin-name">Admin User</h3>
+                <p>Administrator</p>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="javascript:void(0)" class="menu-item active" onclick="showSection('dashboard'); return false;">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="javascript:void(0)" class="menu-item" onclick="showSection('departments'); return false;">
+                <i class="fas fa-building"></i>
+                <span>Department Management</span>
+            </a>
+            <a href="javascript:void(0)" class="menu-item" onclick="showSection('petitions'); return false;">
+                <i class="fas fa-list"></i>
+                <span>Petition Management</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="#" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" class="menu-item" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="page-title">
+                <h2>Admin Dashboard</h2>
+            </div>
+            
+            <div class="top-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search petitions...">
+                </div>
+                
+                <div class="notifications" id="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-total" id="total-petitions-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-petitions">0</h3>
+                        <p>Total Petitions</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-pending" id="pending-petitions-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pending-petitions">0</h3>
+                        <p>Pending Petitions</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-progress" id="progress-petitions-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="progress-petitions">0</h3>
+                        <p>In Progress</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-resolved" id="resolved-petitions-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="resolved-petitions">0</h3>
+                        <p>Resolved</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Petitions Overview</h3>
+                        <div class="chart-actions">
+                            <select id="time-period">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30" selected>Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="petitionChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Department Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="departmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Department Management Section (Hidden by default) -->
+            <div id="department-section" style="display: none;">
+                <div class="table-section">
+                    <div class="section-header">
+                        <h3>Department Management</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="openAddDepartmentModal()">
+                                <i class="fas fa-plus"></i> Add Department
+                            </button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Department Name</th>
+                                <th>Email</th>
+                                <th>Categories</th>
+                                <th>Contact</th>
+                                <th>Created Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="departments-tbody">
+                            <!-- Departments will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div id="dept-empty-state" class="empty-state" style="display: none;">
+                        <i class="fas fa-building"></i>
+                        <h3>No Departments Found</h3>
+                        <p>Click "Add Department" to create a new department.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Petitions Table -->
+            <div class="table-section" id="petitions-section">
+                <div class="section-header">
+                    <h3>Recent Petitions</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-outline" id="filter-btn">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                        <button class="btn btn-primary" id="export-btn">
+                            <i class="fas fa-download"></i> Export PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="petitions-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Department</th>
+                                <th>Urgency</th>
+                                <th>Deadline</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="petitions-tbody">
+                            <!-- Petitions will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div id="empty-state" class="empty-state" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Petitions Found</h3>
+                        <p>There are no petitions in the system yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="loading-text">Loading Dashboard</div>
+            <div class="loading-subtext">Retrieving system data...</div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" id="toast-icon"></i>
+        <span id="toast-message">Operation completed successfully</span>
+    </div>
+
+    <!-- Add Department Modal -->
+    <div class="modal-overlay" id="add-department-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add New Department</h2>
+                <button class="modal-close" onclick="closeAddDepartmentModal()">&times;</button>
+            </div>
+            <form id="add-department-form">
+                <div class="filter-group">
+                    <label for="dept-name">Department Name *</label>
+                    <input type="text" id="dept-name" required placeholder="Enter department name">
+                </div>
+                <div class="filter-group">
+                    <label for="dept-email">Department Email *</label>
+                    <input type="email" id="dept-email" required placeholder="Enter department email">
+                </div>
+                <div class="filter-group">
+                    <label for="dept-password">Password *</label>
+                    <input type="password" id="dept-password" required placeholder="Enter password">
+                </div>
+                <div class="filter-group">
+                    <label for="dept-categories">Categories (Optional)</label>
+                    <input type="text" id="dept-categories" placeholder="Enter categories separated by commas">
+                    <small>Example: Infrastructure, Roads, Water Supply</small>
+                </div>
+                <div class="filter-group">
+                    <label for="dept-profile">Department Profile/Description (Optional)</label>
+                    <textarea id="dept-profile" rows="4" placeholder="Enter department description, responsibilities, and contact information"></textarea>
+                    <small>This will be visible to users when they submit petitions</small>
+                </div>
+                <div class="filter-group">
+                    <label for="dept-phone">Contact Phone (Optional)</label>
+                    <input type="tel" id="dept-phone" placeholder="Enter contact phone number">
+                </div>
+                <div class="filter-group">
+                    <label for="dept-address">Office Address (Optional)</label>
+                    <input type="text" id="dept-address" placeholder="Enter office address">
+                </div>
+                <div class="filter-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeAddDepartmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Department</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Department Profile Modal -->
+    <div class="modal-overlay" id="department-profile-modal">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-building"></i> <span id="profile-dept-name">Department Profile</span></h2>
+                <button class="modal-close" onclick="closeDepartmentProfileModal()">&times;</button>
+            </div>
+            <div class="department-profile-content">
+                <div class="profile-section">
+                    <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Department Name:</label>
+                            <span id="profile-name">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email:</label>
+                            <span id="profile-email">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Contact Phone:</label>
+                            <span id="profile-phone">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Office Address:</label>
+                            <span id="profile-address">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3><i class="fas fa-tags"></i> Categories</h3>
+                    <div id="profile-categories" class="categories-list">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3><i class="fas fa-file-alt"></i> Department Description</h3>
+                    <div id="profile-description" class="description-box">
+                        <!-- Description will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3><i class="fas fa-chart-line"></i> Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-inbox"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="profile-total-petitions">0</span>
+                                <span class="stat-label">Total Petitions</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="profile-pending-petitions">0</span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="profile-resolved-petitions">0</span>
+                                <span class="stat-label">Resolved</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn btn-outline" onclick="editDepartmentProfile()">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                    <button class="btn btn-primary" onclick="closeDepartmentProfileModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Department Profile Modal -->
+    <div class="modal-overlay" id="edit-department-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Department Profile</h2>
+                <button class="modal-close" onclick="closeEditDepartmentModal()">&times;</button>
+            </div>
+            <form id="edit-department-form">
+                <input type="hidden" id="edit-dept-id">
+                <div class="filter-group">
+                    <label for="edit-dept-name">Department Name *</label>
+                    <input type="text" id="edit-dept-name" required placeholder="Enter department name">
+                </div>
+                <div class="filter-group">
+                    <label for="edit-dept-email">Department Email *</label>
+                    <input type="email" id="edit-dept-email" required placeholder="Enter department email">
+                </div>
+                <div class="filter-group">
+                    <label for="edit-dept-categories">Categories (Optional)</label>
+                    <input type="text" id="edit-dept-categories" placeholder="Enter categories separated by commas">
+                    <small>Example: Infrastructure, Roads, Water Supply</small>
+                </div>
+                <div class="filter-group">
+                    <label for="edit-dept-profile">Department Profile/Description (Optional)</label>
+                    <textarea id="edit-dept-profile" rows="4" placeholder="Enter department description"></textarea>
+                </div>
+                <div class="filter-group">
+                    <label for="edit-dept-phone">Contact Phone (Optional)</label>
+                    <input type="tel" id="edit-dept-phone" placeholder="Enter contact phone number">
+                </div>
+                <div class="filter-group">
+                    <label for="edit-dept-address">Office Address (Optional)</label>
+                    <input type="text" id="edit-dept-address" placeholder="Enter office address">
+                </div>
+                <div class="filter-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeEditDepartmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div class="modal-overlay" id="filter-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Filter Petitions</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="filter-group">
+                <label for="filter-status">Status</label>
+                <select id="filter-status">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-category">Category</label>
+                <select id="filter-category">
+                    <option value="">All Categories</option>
+                    <option value="infrastructure">Infrastructure</option>
+                    <option value="health">Health</option>
+                    <option value="education">Education</option>
+                    <option value="security">Security</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-department">Department</label>
+                <select id="filter-department">
+                    <option value="">All Departments</option>
+                    <option value="public_works">Public Works</option>
+                    <option value="health">Health Department</option>
+                    <option value="education">Education Department</option>
+                    <option value="police">Police Department</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-date">Date Range</label>
+                <input type="date" id="filter-date">
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-outline" id="reset-filters">Reset</button>
+                <button class="btn btn-primary" id="apply-filters">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Purpose Modal for Petition Details -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target === this) utils.hideModal()">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="modal-title">Modal Title</h2>
+                <button class="close-btn" onclick="utils.hideModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- Modal content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard state
+        const dashboardState = {
+            petitions: [],
+            filteredPetitions: [],
+            countdownInterval: null,
+            filters: {
+                search: '',
+                status: '',
+                category: '',
+                department: '',
+                date: ''
+            },
+            charts: {
+                petitionChart: null,
+                departmentChart: null
+            }
+        };
+
+        // Section navigation function (must be in global scope for onclick handlers)
+        function showSection(section) {
+            console.log('Switching to section:', section);
+            
+            // Get all section elements
+            const deptSection = document.getElementById('department-section');
+            const petitionsSection = document.getElementById('petitions-section');
+            const statsGrid = document.querySelector('.stats-grid');
+            const chartsSection = document.querySelector('.charts-section');
+            
+            // Update menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (section === 'dashboard') {
+                // Show dashboard elements
+                if (statsGrid) statsGrid.style.display = 'grid';
+                if (chartsSection) chartsSection.style.display = 'grid';
+                if (petitionsSection) petitionsSection.style.display = 'block';
+                if (deptSection) deptSection.style.display = 'none';
+                document.querySelectorAll('.menu-item')[0].classList.add('active');
+            } else if (section === 'departments') {
+                // Show only department section
+                if (statsGrid) statsGrid.style.display = 'none';
+                if (chartsSection) chartsSection.style.display = 'none';
+                if (petitionsSection) petitionsSection.style.display = 'none';
+                if (deptSection) {
+                    deptSection.style.display = 'block';
+                    // Load departments if the function exists
+                    if (typeof loadDepartments === 'function') {
+                        loadDepartments();
+                    }
+                }
+                document.querySelectorAll('.menu-item')[1].classList.add('active');
+            } else if (section === 'petitions') {
+                // Show only petitions section
+                if (statsGrid) statsGrid.style.display = 'none';
+                if (chartsSection) chartsSection.style.display = 'none';
+                if (deptSection) deptSection.style.display = 'none';
+                if (petitionsSection) {
+                    petitionsSection.style.display = 'block';
+                    petitionsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+                document.querySelectorAll('.menu-item')[2].classList.add('active');
+            }
+        }
+
+        // Utility functions
+        const utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const toastIcon = document.getElementById('toast-icon');
+                const toastMessage = document.getElementById('toast-message');
+                
+                // Set toast content and style
+                toastMessage.textContent = message;
+                toast.className = `toast ${type}`;
+                
+                // Set appropriate icon
+                if (type === 'success') {
+                    toastIcon.className = 'fas fa-check-circle';
+                } else if (type === 'error') {
+                    toastIcon.className = 'fas fa-exclamation-circle';
+                } else if (type === 'warning') {
+                    toastIcon.className = 'fas fa-exclamation-triangle';
+                }
+                
+                // Show toast
+                toast.classList.add('show');
+                
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            },
+
+            showLoading() {
+                document.getElementById('loading-overlay').style.display = 'flex';
+            },
+
+            hideLoading() {
+                document.getElementById('loading-overlay').style.display = 'none';
+            },
+
+            formatDate(dateString) {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            },
+
+            titleCase(str) {
+                return str.replace(/\w\S*/g, function(txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                }).replace(/_/g, ' ');
+            },
+            
+            calculateDeadline(deadline, createdAt, urgency) {
+                if (!deadline) {
+                    // If no deadline exists, calculate one based on urgency
+                    const created = new Date(createdAt);
+                    const urgencyHours = {
+                        'critical': 24,
+                        'high': 72,
+                        'medium': 168,
+                        'low': 336
+                    };
+                    const hours = urgencyHours[urgency.toLowerCase()] || 168;
+                    deadline = new Date(created.getTime() + hours * 60 * 60 * 1000);
+                }
+                
+                const deadlineDate = new Date(deadline);
+                const now = new Date();
+                const diff = deadlineDate - now;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const days = Math.floor(hours / 24);
+                
+                let text, cssClass;
+                
+                if (diff < 0) {
+                    const hoursOverdue = Math.abs(hours);
+                    if (hoursOverdue < 24) {
+                        text = `${hoursOverdue}h overdue`;
+                    } else {
+                        text = `${Math.abs(days)}d overdue`;
+                    }
+                    cssClass = 'overdue';
+                } else if (hours < 24) {
+                    text = `${hours}h remaining`;
+                    cssClass = 'critical';
+                } else if (days < 3) {
+                    text = `${days}d ${hours % 24}h left`;
+                    cssClass = 'critical';
+                } else {
+                    text = `${days} days left`;
+                    cssClass = 'normal';
+                }
+                
+                return {
+                    text: text,
+                    class: cssClass,
+                    date: deadlineDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                };
+            },
+            
+            showModal(title, content) {
+                const overlay = document.getElementById('modal-overlay');
+                const modalTitle = document.getElementById('modal-title');
+                const modalBody = document.getElementById('modal-body');
+                
+                if (overlay && modalTitle && modalBody) {
+                    modalTitle.textContent = title;
+                    modalBody.innerHTML = content;
+                    overlay.classList.add('active');
+                } else {
+                    console.error('Modal elements not found');
+                }
+            },
+            
+            hideModal() {
+                const overlay = document.getElementById('modal-overlay');
+                if (overlay) {
+                    overlay.classList.remove('active');
+                }
+            }
+        };
+
+        // Authentication functions
+        const auth = {
+            async isAuthenticated() {
+                try {
+                    const response = await fetch('/api/check-auth', {
+                        credentials: 'include'
+                    });
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    return data.authenticated && data.user_type === 'admin';
+                } catch (error) {
+                    console.error('Auth check error:', error);
+                    return false;
+                }
+            },
+
+            redirectToLogin() {
+                window.location.href = 'login.html';
+            },
+
+            async logout() {
+                try {
+                    const response = await fetch('/logout', {
+                        credentials: 'include',
+                        method: 'GET'
+                    });
+                    if (response.ok) {
+                        this.redirectToLogin();
+                    } else {
+                        throw new Error('Logout failed');
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    // Still redirect to login even if logout fails
+                    this.redirectToLogin();
+                }
+            }
+        };
+
+        // API functions
+        const api = {
+            async fetchStats() {
+                try {
+                    console.log('Fetching stats from /api/admin/stats...');
+                    const response = await fetch('/api/admin/stats', {
+                        credentials: 'include'
+                    });
+                    
+                    console.log('Stats response status:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Stats data:', data);
+                    
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching stats:', error);
+                    // Return default data if API fails
+                    return {
+                        total_petitions: 0,
+                        pending: 0,
+                        in_progress: 0,
+                        resolved: 0
+                    };
+                }
+            },
+
+            async fetchPetitions(filters = {}) {
+                try {
+                    const response = await fetch('/api/admin/petitions', {
+                        credentials: 'include'
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    
+                    // Apply filters if provided
+                    let filtered = data.petitions || [];
+                    
+                    if (filters.search) {
+                        const searchTerm = filters.search.toLowerCase();
+                        filtered = filtered.filter(p => 
+                            p.title.toLowerCase().includes(searchTerm) || 
+                            p.ticket_id.toLowerCase().includes(searchTerm)
+                        );
+                    }
+                    
+                    if (filters.status) {
+                        filtered = filtered.filter(p => p.status === filters.status);
+                    }
+                    
+                    if (filters.category) {
+                        filtered = filtered.filter(p => p.category.toLowerCase() === filters.category);
+                    }
+                    
+                    if (filters.department) {
+                        filtered = filtered.filter(p => p.department.toLowerCase().replace(' ', '_') === filters.department);
+                    }
+                    
+                    return { petitions: filtered };
+                } catch (error) {
+                    console.error('Error fetching petitions:', error);
+                    // Return empty array if API fails
+                    return { petitions: [] };
+                }
+            },
+
+            async fetchChartData(timePeriod = '30') {
+                try {
+                    // For now, we'll generate mock data based on actual petitions
+                    const response = await fetch('/api/admin/petitions', {
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const petitions = data.petitions || [];
+                        
+                        // Generate chart data based on actual petitions
+                        const days = parseInt(timePeriod);
+                        const labels = [];
+                        const submittedData = [];
+                        const resolvedData = [];
+                        
+                        const today = new Date();
+                        for (let i = days; i >= 0; i--) {
+                            const date = new Date();
+                            date.setDate(today.getDate() - i);
+                            labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                            
+                            // Count petitions for this date
+                            const dateStr = date.toISOString().split('T')[0];
+                            const submittedCount = petitions.filter(p => {
+                                const petitionDate = new Date(p.created_at).toISOString().split('T')[0];
+                                return petitionDate === dateStr;
+                            }).length;
+                            
+                            const resolvedCount = petitions.filter(p => {
+                                if (p.status !== 'resolved') return false;
+                                const resolvedDate = new Date(p.updated_at).toISOString().split('T')[0];
+                                return resolvedDate === dateStr;
+                            }).length;
+                            
+                            submittedData.push(submittedCount);
+                            resolvedData.push(resolvedCount);
+                        }
+                        
+                        return {
+                            labels,
+                            submitted: submittedData,
+                            resolved: resolvedData
+                        };
+                    } else {
+                        throw new Error('Failed to fetch chart data');
+                    }
+                } catch (error) {
+                    console.error('Error fetching chart data:', error);
+                    // Return mock data if API fails
+                    const days = parseInt(timePeriod);
+                    const labels = [];
+                    const submittedData = [];
+                    const resolvedData = [];
+                    
+                    const today = new Date();
+                    for (let i = days; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(today.getDate() - i);
+                        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                        
+                        // Generate random data
+                        submittedData.push(Math.floor(Math.random() * 20) + 5);
+                        resolvedData.push(Math.floor(Math.random() * 15) + 2);
+                    }
+                    
+                    return {
+                        labels,
+                        submitted: submittedData,
+                        resolved: resolvedData
+                    };
+                }
+            },
+
+            async fetchDepartmentData() {
+                try {
+                    const response = await fetch('/api/admin/petitions', {
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const petitions = data.petitions || [];
+                        
+                        // Count petitions by department
+                        const departmentCounts = {};
+                        petitions.forEach(petition => {
+                            const dept = petition.department;
+                            departmentCounts[dept] = (departmentCounts[dept] || 0) + 1;
+                        });
+                        
+                        const labels = Object.keys(departmentCounts);
+                        const dataValues = Object.values(departmentCounts);
+                        
+                        return {
+                            labels,
+                            data: dataValues
+                        };
+                    } else {
+                        throw new Error('Failed to fetch department data');
+                    }
+                } catch (error) {
+                    console.error('Error fetching department data:', error);
+                    // Return mock data if API fails
+                    return {
+                        labels: ['Public Works', 'Health', 'Education', 'Police', 'Environment'],
+                        data: [30, 25, 20, 15, 10]
+                    };
+                }
+            },
+
+            async getCurrentUser() {
+                try {
+                    const response = await fetch('/api/current-user', {
+                        credentials: 'include'
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching current user:', error);
+                    return { name: 'Admin User' };
+                }
+            }
+        };
+
+        // Dashboard functions
+        const dashboard = {
+            async initialize() {
+                try {
+                    utils.showLoading();
+                    
+                    // Check authentication
+                    if (!await auth.isAuthenticated()) {
+                        auth.redirectToLogin();
+                        return;
+                    }
+                    
+                    // Load admin data
+                    await this.loadAdminData();
+                    
+                    // Load dashboard data
+                    await Promise.all([
+                        this.loadStats(),
+                        this.loadPetitions(),
+                        this.loadChartData()
+                    ]);
+                    
+                    // Initialize charts
+                    this.initializeCharts();
+                    
+                    // Set up event listeners
+                    this.setupEventListeners();
+                    
+                    utils.showToast('Dashboard loaded successfully', 'success');
+                    
+                } catch (error) {
+                    console.error('Dashboard initialization error:', error);
+                    utils.showToast('Failed to load dashboard data. Using mock data.', 'warning');
+                    
+                    // Load mock data as fallback
+                    await this.loadMockData();
+                } finally {
+                    utils.hideLoading();
+                }
+            },
+
+            async loadMockData() {
+                // Set mock stats
+                document.getElementById('total-petitions').textContent = '1247';
+                document.getElementById('pending-petitions').textContent = '342';
+                document.getElementById('progress-petitions').textContent = '189';
+                document.getElementById('resolved-petitions').textContent = '716';
+                
+                // Load mock petitions
+                await this.loadPetitions();
+                
+                // Load mock chart data
+                await this.loadChartData();
+                this.initializeCharts();
+            },
+
+            async loadAdminData() {
+                try {
+                    const admin = await api.getCurrentUser();
+                    document.getElementById('admin-name').textContent = admin.name;
+                    document.getElementById('admin-avatar').textContent = 
+                        admin.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                } catch (error) {
+                    console.error('Error loading admin data:', error);
+                }
+            },
+
+            async loadStats() {
+                try {
+                    console.log('Loading admin stats...');
+                    const data = await api.fetchStats();
+                    console.log('Stats data received:', data);
+                    
+                    // Update stats cards with animation
+                    const updateStat = (id, value) => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.style.opacity = '0';
+                            setTimeout(() => {
+                                element.textContent = value || 0;
+                                element.style.opacity = '1';
+                            }, 100);
+                        } else {
+                            console.error(`Element with id '${id}' not found`);
+                        }
+                    };
+                    
+                    updateStat('total-petitions', data.total_petitions);
+                    updateStat('pending-petitions', data.pending);
+                    updateStat('progress-petitions', data.in_progress);
+                    updateStat('resolved-petitions', data.resolved);
+                    
+                    console.log('Stats updated successfully');
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                    utils.showToast('Failed to load statistics', 'error');
+                    throw error;
+                }
+            },
+
+            async loadPetitions(filters = {}) {
+                try {
+                    const data = await api.fetchPetitions(filters);
+                    dashboardState.petitions = data.petitions;
+                    dashboardState.filteredPetitions = data.petitions;
+                    this.displayPetitions(data.petitions);
+                } catch (error) {
+                    console.error('Error loading petitions:', error);
+                    throw error;
+                }
+            },
+
+            displayPetitions(petitions) {
+                const tbody = document.getElementById('petitions-tbody');
+                const emptyState = document.getElementById('empty-state');
+                
+                if (petitions && petitions.length > 0) {
+                    tbody.innerHTML = '';
+                    emptyState.style.display = 'none';
+                    
+                    petitions.forEach(petition => {
+                        const row = document.createElement('tr');
+                        
+                        // Calculate deadline status
+                        const deadlineInfo = utils.calculateDeadline(petition.deadline, petition.created_at, petition.urgency);
+                        
+                        row.innerHTML = `
+                            <td>${petition.ticket_id}</td>
+                            <td>${petition.title}</td>
+                            <td>${petition.category}</td>
+                            <td>${petition.department}</td>
+                            <td><span class="urgency-badge urgency-${petition.urgency.toLowerCase()}">${petition.urgency}</span></td>
+                            <td>
+                                <div class="deadline-cell">
+                                    <span class="deadline-timer ${deadlineInfo.class}">${deadlineInfo.text}</span>
+                                    <span class="deadline-date">${deadlineInfo.date}</span>
+                                </div>
+                            </td>
+                            <td>${utils.formatDate(petition.created_at)}</td>
+                            <td><span class="status status-${petition.status.replace('_', '-')}">${utils.titleCase(petition.status)}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn view-btn" onclick="dashboard.viewPetition('${petition.ticket_id}')">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // Update countdown timers every minute
+                    if (dashboardState.countdownInterval) {
+                        clearInterval(dashboardState.countdownInterval);
+                    }
+                    dashboardState.countdownInterval = setInterval(() => {
+                        this.updateCountdowns();
+                    }, 60000); // Update every minute
+                    
+                } else {
+                    tbody.innerHTML = '';
+                    emptyState.style.display = 'block';
+                }
+            },
+            
+            updateCountdowns() {
+                // Refresh the petition display to update countdowns
+                if (dashboardState.filteredPetitions && dashboardState.filteredPetitions.length > 0) {
+                    this.displayPetitions(dashboardState.filteredPetitions);
+                }
+            },
+
+            viewPetition(ticketId) {
+                console.log('Viewing petition:', ticketId);
+                // Open petition details modal
+                const petition = dashboardState.petitions.find(p => p.ticket_id === ticketId);
+                if (petition) {
+                    this.showPetitionDetailsModal(petition);
+                }
+            },
+            
+            showPetitionDetailsModal(petition) {
+                const deadlineInfo = utils.calculateDeadline(petition.deadline, petition.created_at, petition.urgency);
+                
+                utils.showModal('Petition Details', `
+                    <div class="petition-details">
+                        <div class="detail-row">
+                            <strong>Ticket ID:</strong>
+                            <span>${petition.ticket_id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Title:</strong>
+                            <span>${petition.title}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Category:</strong>
+                            <span>${petition.category}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Department:</strong>
+                            <span>${petition.department}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Urgency:</strong>
+                            <span class="urgency-badge urgency-${petition.urgency.toLowerCase()}">${petition.urgency}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Deadline:</strong>
+                            <span class="deadline-timer ${deadlineInfo.class}">${deadlineInfo.text} - ${deadlineInfo.date}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Status:</strong>
+                            <span class="status status-${petition.status.replace('_', '-')}">${utils.titleCase(petition.status)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Submitted By:</strong>
+                            <span>${petition.full_name} (${petition.email})</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Phone:</strong>
+                            <span>${petition.phone}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Location:</strong>
+                            <span>${petition.location}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Submitted On:</strong>
+                            <span>${utils.formatDate(petition.created_at)}</span>
+                        </div>
+                        <div class="detail-row full-width">
+                            <strong>Description:</strong>
+                            <p style="margin-top: 0.5rem; line-height: 1.6;">${petition.description}</p>
+                        </div>
+                    </div>
+                `);
+            },
+
+            async loadChartData() {
+                try {
+                    const timePeriod = document.getElementById('time-period').value;
+                    const [overviewData, departmentData] = await Promise.all([
+                        api.fetchChartData(timePeriod),
+                        api.fetchDepartmentData()
+                    ]);
+                    
+                    dashboardState.chartData = {
+                        overview: overviewData,
+                        department: departmentData
+                    };
+                } catch (error) {
+                    console.error('Error loading chart data:', error);
+                    throw error;
+                }
+            },
+
+            initializeCharts() {
+                // Destroy existing charts if they exist
+                if (dashboardState.charts.petitionChart) {
+                    dashboardState.charts.petitionChart.destroy();
+                }
+                if (dashboardState.charts.departmentChart) {
+                    dashboardState.charts.departmentChart.destroy();
+                }
+
+                // Petition Overview Chart
+                const petitionCtx = document.getElementById('petitionChart').getContext('2d');
+                dashboardState.charts.petitionChart = new Chart(petitionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: dashboardState.chartData.overview.labels,
+                        datasets: [{
+                            label: 'Submitted',
+                            data: dashboardState.chartData.overview.submitted,
+                            borderColor: '#4361ee',
+                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }, {
+                            label: 'Resolved',
+                            data: dashboardState.chartData.overview.resolved,
+                            borderColor: '#4cc9f0',
+                            backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Department Distribution Chart
+                const departmentCtx = document.getElementById('departmentChart').getContext('2d');
+                dashboardState.charts.departmentChart = new Chart(departmentCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: dashboardState.chartData.department.labels,
+                        datasets: [{
+                            data: dashboardState.chartData.department.data,
+                            backgroundColor: [
+                                '#4361ee',
+                                '#4cc9f0',
+                                '#7209b7',
+                                '#f8961e',
+                                '#f72585',
+                                '#4895ef',
+                                '#560bad',
+                                '#b5179e'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            },
+
+            setupEventListeners() {
+                // Search functionality
+                const searchInput = document.getElementById('search-input');
+                const searchHandler = utils.debounce((query) => {
+                    dashboardState.filters.search = query;
+                    this.applyFilters();
+                }, 300);
+                
+                searchInput.addEventListener('input', (e) => {
+                    searchHandler(e.target.value);
+                });
+                
+                // Time period change
+                document.getElementById('time-period').addEventListener('change', async (e) => {
+                    try {
+                        utils.showLoading();
+                        await this.loadChartData();
+                        this.updateCharts();
+                    } catch (error) {
+                        console.error('Error updating charts:', error);
+                        utils.showToast('Failed to update charts', 'error');
+                    } finally {
+                        utils.hideLoading();
+                    }
+                });
+                
+                // Filter modal
+                document.getElementById('filter-btn').addEventListener('click', () => {
+                    document.getElementById('filter-modal').classList.add('active');
+                });
+                
+                document.getElementById('modal-close').addEventListener('click', () => {
+                    document.getElementById('filter-modal').classList.remove('active');
+                });
+                
+                document.getElementById('apply-filters').addEventListener('click', () => {
+                    this.applyFilters();
+                    document.getElementById('filter-modal').classList.remove('active');
+                });
+                
+                document.getElementById('reset-filters').addEventListener('click', () => {
+                    this.resetFilters();
+                });
+                
+                // Export functionality
+                document.getElementById('export-btn').addEventListener('click', () => {
+                    this.exportToPDF();
+                });
+                
+                // Stats card clicks
+                document.getElementById('total-petitions-card').addEventListener('click', () => {
+                    this.filterByStatus('');
+                });
+                
+                document.getElementById('pending-petitions-card').addEventListener('click', () => {
+                    this.filterByStatus('pending');
+                });
+                
+                document.getElementById('progress-petitions-card').addEventListener('click', () => {
+                    this.filterByStatus('in_progress');
+                });
+                
+                document.getElementById('resolved-petitions-card').addEventListener('click', () => {
+                    this.filterByStatus('resolved');
+                });
+                
+                // Logout - FIXED: Proper event listener
+                document.getElementById('logout-btn').addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await auth.logout();
+                });
+            },
+
+            async applyFilters() {
+                try {
+                    utils.showLoading();
+                    
+                    // Get filter values
+                    dashboardState.filters.status = document.getElementById('filter-status').value;
+                    dashboardState.filters.category = document.getElementById('filter-category').value;
+                    dashboardState.filters.department = document.getElementById('filter-department').value;
+                    dashboardState.filters.date = document.getElementById('filter-date').value;
+                    
+                    await this.loadPetitions(dashboardState.filters);
+                    
+                    utils.showToast('Filters applied successfully', 'success');
+                } catch (error) {
+                    console.error('Error applying filters:', error);
+                    utils.showToast('Failed to apply filters', 'error');
+                } finally {
+                    utils.hideLoading();
+                }
+            },
+
+            resetFilters() {
+                document.getElementById('filter-status').value = '';
+                document.getElementById('filter-category').value = '';
+                document.getElementById('filter-department').value = '';
+                document.getElementById('filter-date').value = '';
+                document.getElementById('search-input').value = '';
+                
+                dashboardState.filters = {
+                    search: '',
+                    status: '',
+                    category: '',
+                    department: '',
+                    date: ''
+                };
+                
+                this.loadPetitions();
+                utils.showToast('Filters reset', 'success');
+            },
+
+            filterByStatus(status) {
+                document.getElementById('filter-status').value = status;
+                this.applyFilters();
+            },
+
+            updateCharts() {
+                if (dashboardState.charts.petitionChart && dashboardState.chartData) {
+                    dashboardState.charts.petitionChart.data.labels = dashboardState.chartData.overview.labels;
+                    dashboardState.charts.petitionChart.data.datasets[0].data = dashboardState.chartData.overview.submitted;
+                    dashboardState.charts.petitionChart.data.datasets[1].data = dashboardState.chartData.overview.resolved;
+                    dashboardState.charts.petitionChart.update();
+                }
+                
+                if (dashboardState.charts.departmentChart && dashboardState.chartData) {
+                    dashboardState.charts.departmentChart.data.labels = dashboardState.chartData.department.labels;
+                    dashboardState.charts.departmentChart.data.datasets[0].data = dashboardState.chartData.department.data;
+                    dashboardState.charts.departmentChart.update();
+                }
+            },
+
+            exportToPDF() {
+                // In a real application, this would generate and download a PDF
+                utils.showToast('PDF export functionality would be implemented here', 'success');
+            },
+
+            editPetition(ticketId) {
+                // In a real application, this would open an edit modal
+                utils.showToast(`Edit functionality for ${ticketId} would be implemented here`, 'success');
+            },
+
+            deletePetition(ticketId) {
+                if (confirm('Are you sure you want to delete this petition?')) {
+                    // In a real application, this would call an API to delete the petition
+                    utils.showToast(`Delete functionality for ${ticketId} would be implemented here`, 'success');
+                }
+            }
+        };
+
+        // Initialize the dashboard when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            dashboard.initialize();
+        });
+    </script>
+</body>
+</html>

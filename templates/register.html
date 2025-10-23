@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Petition Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .register-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .register-left {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .register-right {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .welcome-text h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-text p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .benefits {
+            margin-top: 2rem;
+        }
+        
+        .benefit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .benefit i {
+            color: var(--success);
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .register-header h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .register-header p {
+            color: var(--gray);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .terms input[type="checkbox"] {
+            margin-top: 0.2rem;
+        }
+        
+        .terms label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            line-height: 1.4;
+        }
+        
+        .terms a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .terms a:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            color: var(--gray);
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border);
+            z-index: 1;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .alternative-register {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .alt-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .alt-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--gray);
+        }
+        
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert-error {
+            background: rgba(247, 37, 133, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        .alert-success {
+            background: rgba(76, 201, 240, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .strength-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 0.25rem;
+            overflow: hidden;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+        }
+        
+        .strength-weak { background: var(--danger); width: 33%; }
+        .strength-medium { background: var(--warning); width: 66%; }
+        .strength-strong { background: var(--success); width: 100%; }
+        
+        @media (max-width: 768px) {
+            .register-container {
+                flex-direction: column;
+            }
+            
+            .register-left {
+                padding: 2rem;
+            }
+            
+            .register-right {
+                padding: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .alternative-register {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <!-- Left Side - Welcome Message -->
+        <div class="register-left">
+            <div class="logo">
+                <i class="fas fa-file-signature"></i>
+                <h1>Petition Management System</h1>
+            </div>
+            <div class="welcome-text">
+                <h2>Join Our Community</h2>
+                <p>Create an account to start making a difference in your community through petitions and civic engagement.</p>
+            </div>
+            <div class="benefits">
+                <div class="benefit">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Submit petitions easily</span>
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Track petition progress in real-time</span>
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-bell"></i>
+                    <span>Receive updates on your petitions</span>
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-users"></i>
+                    <span>Connect with local departments</span>
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure and private platform</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side - Registration Form -->
+        <div class="register-right">
+            <div class="register-header">
+                <h2>Create Account</h2>
+                <p>Fill in your details to get started</p>
+            </div>
+            
+            <div id="alert-message" class="alert" style="display: none;"></div>
+            
+            <form id="register-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" class="form-control" placeholder="Enter your first name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" class="form-control" placeholder="Enter your last name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" class="form-control" placeholder="Enter your full address">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <input type="password" id="password" class="form-control" placeholder="Create a password" required>
+                        <div class="password-strength">
+                            <span id="strength-text">Password strength</span>
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strength-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password *</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                </div>
+                
+                <div class="terms">
+                    <input type="checkbox" id="agree-terms" required>
+                    <label for="agree-terms">
+                        I agree to the <a href="#">Terms of Service</a> *
+                    </label>
+                </div>
+                
+                <div class="terms">
+                    <input type="checkbox" id="newsletter">
+                    <label for="newsletter">
+                        Send me updates about new features and community petitions
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+            
+            <div class="login-link">
+                Already have an account? <a href="login.html">Sign in here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div id="otp-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Verify Your Email</h2>
+                <button class="modal-close" onclick="closeOtpModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+                    We've sent a 6-digit OTP to your email address. Please enter it below to verify your account.
+                </p>
+                
+                <div class="otp-input-container">
+                    <input type="text" class="otp-input" maxlength="1" id="otp1" onkeyup="moveToNext(this, null)">
+                    <input type="text" class="otp-input" maxlength="1" id="otp2" onkeyup="moveToNext(this, 'otp1')">
+                    <input type="text" class="otp-input" maxlength="1" id="otp3" onkeyup="moveToNext(this, 'otp2')">
+                    <input type="text" class="otp-input" maxlength="1" id="otp4" onkeyup="moveToNext(this, 'otp3')">
+                    <input type="text" class="otp-input" maxlength="1" id="otp5" onkeyup="moveToNext(this, 'otp4')">
+                    <input type="text" class="otp-input" maxlength="1" id="otp6" onkeyup="moveToNext(this, 'otp5')">
+                </div>
+                
+                <div id="otp-error" class="alert alert-error" style="display: none; margin-top: 1rem;"></div>
+                
+                <button id="verify-otp-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" onclick="verifyOtp()">
+                    Verify OTP
+                </button>
+                
+                <div style="text-align: center; margin-top: 1rem;">
+                    <span style="color: var(--gray);">Didn't receive the code?</span>
+                    <button id="resend-btn" class="btn-link" onclick="resendOtp()" style="background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 500;">
+                        Resend OTP
+                    </button>
+                    <span id="countdown" style="color: var(--gray); margin-left: 5px;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gray);
+            line-height: 1;
+        }
+        
+        .otp-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 2rem 0;
+        }
+        
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn-link {
+            padding: 0;
+            text-decoration: none;
+        }
+        
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <script>
+        let userEmail = '';
+        let resendCountdown = 0;
+        let countdownInterval = null;
+        
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthFill = document.getElementById('strength-fill');
+            const strengthText = document.getElementById('strength-text');
+            
+            let strength = 0;
+            let text = 'Password strength';
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/\d/)) strength++;
+            if (password.match(/[^a-zA-Z\d]/)) strength++;
+            
+            switch(strength) {
+                case 0:
+                case 1:
+                    strengthFill.className = 'strength-fill strength-weak';
+                    text = 'Weak password';
+                    break;
+                case 2:
+                case 3:
+                    strengthFill.className = 'strength-fill strength-medium';
+                    text = 'Medium strength';
+                    break;
+                case 4:
+                    strengthFill.className = 'strength-fill strength-strong';
+                    text = 'Strong password';
+                    break;
+            }
+            
+            strengthText.textContent = text;
+        });
+        
+        // Show alert message
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert-message');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            // Scroll to alert
+            alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Hide alert message
+        function hideAlert() {
+            document.getElementById('alert-message').style.display = 'none';
+        }
+        
+        // Form validation
+        function validateForm(formData) {
+            if (formData.password !== formData.confirmPassword) {
+                showAlert('Passwords do not match.');
+                return false;
+            }
+            
+            if (formData.password.length < 8) {
+                showAlert('Password must be at least 8 characters long.');
+                return false;
+            }
+            
+            if (!formData.agreeTerms) {
+                showAlert('You must agree to the Terms of Service.');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Registration form submission
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value,
+                agreeTerms: document.getElementById('agree-terms').checked,
+                newsletter: document.getElementById('newsletter').checked
+            };
+            
+            // Validate form
+            if (!validateForm(formData)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.requires_verification) {
+                    userEmail = formData.email;
+                    showAlert('Registration successful! Please check your email for OTP.', 'success');
+                    
+                    // Show OTP modal after 1 second
+                    setTimeout(() => {
+                        openOtpModal();
+                        startResendCountdown(60);
+                    }, 1000);
+                } else if (response.ok) {
+                    showAlert('Account created successfully! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showAlert(data.error || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showAlert('Network error. Please check your connection and try again.');
+            }
+        });
+        
+        // OTP Modal functions
+        function openOtpModal() {
+            document.getElementById('otp-modal').classList.add('active');
+            document.getElementById('otp1').focus();
+        }
+        
+        function closeOtpModal() {
+            document.getElementById('otp-modal').classList.remove('active');
+            clearOtpInputs();
+        }
+        
+        function clearOtpInputs() {
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`otp${i}`).value = '';
+            }
+        }
+        
+        function moveToNext(current, prevId) {
+            if (current.value.length === 1) {
+                const currentId = current.id;
+                const nextNum = parseInt(currentId.replace('otp', '')) + 1;
+                if (nextNum <= 6) {
+                    document.getElementById(`otp${nextNum}`).focus();
+                }
+            } else if (current.value.length === 0 && prevId) {
+                document.getElementById(prevId).focus();
+            }
+        }
+        
+        async function verifyOtp() {
+            const otp = [];
+            for (let i = 1; i <= 6; i++) {
+                otp.push(document.getElementById(`otp${i}`).value);
+            }
+            const otpString = otp.join('');
+            
+            if (otpString.length !== 6) {
+                showOtpError('Please enter all 6 digits');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        otp: otpString
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showOtpError('Email verified successfully! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showOtpError(data.error || 'Invalid OTP. Please try again.');
+                    clearOtpInputs();
+                    document.getElementById('otp1').focus();
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showOtpError('Network error. Please try again.');
+            }
+        }
+        
+        async function resendOtp() {
+            if (resendCountdown > 0) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/resend-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: userEmail })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showOtpError('OTP resent successfully!', 'success');
+                    setTimeout(() => {
+                        document.getElementById('otp-error').style.display = 'none';
+                    }, 3000);
+                    startResendCountdown(60);
+                } else {
+                    showOtpError(data.error || 'Failed to resend OTP.');
+                }
+            } catch (error) {
+                console.error('Resend error:', error);
+                showOtpError('Network error. Please try again.');
+            }
+        }
+        
+        function showOtpError(message, type = 'error') {
+            const errorDiv = document.getElementById('otp-error');
+            errorDiv.textContent = message;
+            errorDiv.className = `alert alert-${type}`;
+            errorDiv.style.display = 'block';
+        }
+        
+        function startResendCountdown(seconds) {
+            resendCountdown = seconds;
+            const resendBtn = document.getElementById('resend-btn');
+            const countdownSpan = document.getElementById('countdown');
+            
+            resendBtn.disabled = true;
+            resendBtn.style.opacity = '0.5';
+            resendBtn.style.cursor = 'not-allowed';
+            
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            countdownInterval = setInterval(() => {
+                resendCountdown--;
+                countdownSpan.textContent = `(${resendCountdown}s)`;
+                
+                if (resendCountdown <= 0) {
+                    clearInterval(countdownInterval);
+                    resendBtn.disabled = false;
+                    resendBtn.style.opacity = '1';
+                    resendBtn.style.cursor = 'pointer';
+                    countdownSpan.textContent = '';
+                }
+            }, 1000);
+        }
+        
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('user');
+            // Only redirect if user is logged in and not on registration page
+            if (user && window.location.pathname.indexOf('register.html') === -1) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

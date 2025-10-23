@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Dashboard | Petition Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            display: flex;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .dept-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 0;
+        }
+        
+        .dept-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .dept-details h3 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .dept-details p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--success);
+        }
+        
+        .menu-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-title h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 250px;
+            font-size: 0.9rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notifications:hover i {
+            color: var(--primary);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .notification-badge.hidden {
+            display: none;
+        }
+        
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            width: 380px;
+            max-height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .notification-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .notification-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .notification-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .mark-all-read {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .mark-all-read:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-item.unread {
+            background: #f0f7ff;
+        }
+        
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary);
+        }
+        
+        .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+        
+        .notif-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+        }
+        
+        .notif-time {
+            font-size: 0.75rem;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+        
+        .notif-details {
+            font-size: 0.85rem;
+            color: var(--gray);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .notif-ticket {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .notif-urgency {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .notif-urgency.high {
+            background: #fee;
+            color: var(--danger);
+        }
+        
+        .notif-urgency.medium {
+            background: #fef9e7;
+            color: var(--warning);
+        }
+        
+        .notif-urgency.low {
+            background: #e8f8f5;
+            color: var(--success);
+        }
+        
+        .empty-notifications {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: var(--gray);
+        }
+        
+        .empty-notifications i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ddd;
+        }
+        
+        .empty-notifications p {
+            font-size: 0.9rem;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .stat-assigned .stat-icon { background: var(--primary); }
+        .stat-pending .stat-icon { background: var(--warning); }
+        .stat-progress .stat-icon { background: var(--success); }
+        .stat-overdue .stat-icon { background: var(--danger); }
+        
+        /* Tables */
+        .table-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #3ab8e0;
+        }
+        
+        .btn-sm {
+            padding: 0.3rem 0.7rem;
+            font-size: 0.8rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-in-progress {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-resolved {
+            background: rgba(5, 150, 105, 0.1);
+            color: #059669;
+        }
+        
+        .status-rejected {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .status-select {
+            padding: 0.4rem 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+        
+        .status-select:hover {
+            border-color: var(--primary);
+        }
+        
+        .status-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .priority {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .priority-high {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .priority-medium {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .priority-low {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .badge-info {
+            background: rgba(67, 97, 238, 0.15);
+            color: var(--primary);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .stat-card:hover {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.95), rgba(114, 9, 183, 0.95));
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .loading-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        .loading-spinner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+        }
+        
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+        
+        .spinner-ring:nth-child(1) {
+            border-top-color: #fff;
+            border-right-color: #fff;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner-ring:nth-child(2) {
+            border-bottom-color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(255, 255, 255, 0.6);
+            animation: spin 2s linear infinite reverse;
+        }
+        
+        .spinner-ring:nth-child(3) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-top-color: rgba(255, 255, 255, 0.4);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        /* Petition Details Modal */
+        .petition-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .petition-modal-content {
+            background-color: #ffffff;
+            margin: 2% auto;
+            max-width: 800px;
+            width: 90%;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .petition-modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .petition-modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+        
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .petition-modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 100px);
+        }
+        
+        .detail-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .detail-card-header i {
+            font-size: 1.3rem;
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-label i {
+            color: var(--primary);
+        }
+        
+        .detail-value {
+            color: var(--dark);
+            word-wrap: break-word;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .status-badge.pending {
+            background: rgba(248, 150, 30, 0.15);
+            color: var(--warning);
+        }
+        
+        .status-badge.in-progress {
+            background: rgba(67, 97, 238, 0.15);
+            color: var(--primary);
+        }
+        
+        .status-badge.resolved {
+            background: rgba(76, 201, 240, 0.15);
+            color: var(--success);
+        }
+        
+        .status-badge.rejected {
+            background: rgba(247, 37, 133, 0.15);
+            color: var(--danger);
+        }
+        
+        .urgency-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .urgency-badge.low {
+            background: rgba(76, 201, 240, 0.15);
+            color: var(--success);
+        }
+        
+        .urgency-badge.medium {
+            background: rgba(248, 150, 30, 0.15);
+            color: var(--warning);
+        }
+        
+        .urgency-badge.high {
+            background: rgba(247, 37, 133, 0.15);
+            color: var(--danger);
+        }
+        
+        .description-box {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            line-height: 1.8;
+            color: var(--dark);
+        }
+        
+        /* Status Update Modal */
+        .status-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .status-modal.active {
+            display: flex;
+        }
+        
+        .status-modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .status-modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .status-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotateIcon 2s ease-in-out infinite;
+        }
+        
+        .status-icon-wrapper i {
+            font-size: 2.5rem;
+        }
+        
+        @keyframes rotateIcon {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(180deg);
+            }
+        }
+        
+        .status-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .status-modal-body {
+            padding: 2rem;
+            background: white;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .status-update-card {
+            background: #f0f3f8;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .status-update-card h3 {
+            margin: 0 0 1rem 0;
+            color: var(--dark);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-update-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .status-label {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .status-change {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .status-old {
+            color: var(--gray);
+            text-decoration: line-through;
+            padding: 0.3rem 0.8rem;
+            background: #f0f0f0;
+            border-radius: 16px;
+        }
+        
+        .status-arrow {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .status-new {
+            color: white;
+            font-weight: 700;
+            padding: 0.5rem 1.2rem;
+            background: linear-gradient(135deg, var(--success), #4895ef);
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(76, 201, 240, 0.3);
+        }
+        
+        .status-info {
+            background: #e7f3ff;
+            border: 1px solid #bddeff;
+            border-left: 4px solid var(--primary);
+            padding: 1.2rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.1);
+        }
+        
+        .status-info i {
+            color: var(--primary);
+            margin-top: 3px;
+            font-size: 1.2rem;
+        }
+        
+        .status-info p {
+            margin: 0;
+            color: var(--dark);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .status-modal-footer {
+            padding: 1.5rem 2rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .status-modal-footer button {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cancel {
+            background: #e0e0e0;
+            color: var(--dark);
+        }
+        
+        .btn-cancel:hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+        }
+        
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--success), #4895ef);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+        }
+        
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 201, 240, 0.4);
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .logo h1,
+            .sidebar .dept-details,
+            .sidebar .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box input {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <h1 id="dept-name">Department</h1>
+            </div>
+        </div>
+        
+        <div class="dept-info">
+            <div class="dept-avatar" id="dept-avatar">D</div>
+            <div class="dept-details">
+                <h3 id="dept-full-name">Department Name</h3>
+                <p>Department Staff</p>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="department-dashboard.html" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="assigned-petitions.html" class="menu-item">
+                <i class="fas fa-list"></i>
+                <span>Assigned Petitions</span>
+            </a>
+            <a href="department-analytics.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Department Analytics</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="department-settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" class="menu-item" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="page-title">
+                <h2>Department Dashboard</h2>
+            </div>
+            
+            <div class="top-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search petitions...">
+                </div>
+                
+                <div class="notifications" id="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge hidden" id="notification-count">0</span>
+                    
+                    <!-- Notification Dropdown -->
+                    <div class="notification-dropdown" id="notification-dropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button class="mark-all-read" id="mark-all-read">Mark all as read</button>
+                        </div>
+                        <div class="notification-list" id="notification-list">
+                            <div class="empty-notifications">
+                                <i class="fas fa-bell-slash"></i>
+                                <p>No new notifications</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-assigned">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="assigned-petitions">0</h3>
+                        <p>Assigned Petitions</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-pending">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pending-petitions">0</h3>
+                        <p>Pending Review</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-progress">
+                    <div class="stat-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="progress-petitions">0</h3>
+                        <p>In Progress</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-overdue">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="overdue-petitions">0</h3>
+                        <p>Overdue</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Department Petitions Table -->
+            <div class="table-section">
+                <div class="section-header">
+                    <h3>Recent Petitions</h3>
+                    <div class="table-actions">
+                        <select class="btn btn-outline" id="status-filter">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <button class="btn btn-outline" id="refresh-btn">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="petitions-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Submitted</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="petitions-tbody">
+                            <!-- Petitions will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div id="empty-state" class="empty-state" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Petitions Assigned</h3>
+                        <p>There are no petitions assigned to your department yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="loading-text">Loading</div>
+            <div class="loading-subtext">Please wait while we process your request...</div>
+        </div>
+    </div>
+
+    <!-- Petition Details Modal -->
+    <div id="petition-modal" class="petition-modal">
+        <div class="petition-modal-content">
+            <div class="petition-modal-header">
+                <h2><i class="fas fa-file-alt"></i> Petition Details</h2>
+                <button class="modal-close-btn" onclick="dashboard.closeModal()" title="Close" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="petition-modal-body" id="petition-modal-body">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Update Confirmation Modal -->
+    <div id="status-modal" class="status-modal">
+        <div class="status-modal-content">
+            <div class="status-modal-header">
+                <div class="status-icon-wrapper">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h2>Update Petition Status</h2>
+            </div>
+            <div class="status-modal-body" id="status-modal-body">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+            <div class="status-modal-footer">
+                <button class="btn-cancel" onclick="dashboard.cancelStatusUpdate()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn-confirm" onclick="dashboard.confirmStatusUpdate()">
+                    <i class="fas fa-check"></i> Confirm Update
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" id="toast-icon"></i>
+        <span id="toast-message">Operation completed successfully</span>
+    </div>
+
+    <script>
+        // Utility functions
+        const utils = {
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const toastIcon = document.getElementById('toast-icon');
+                const toastMessage = document.getElementById('toast-message');
+                
+                toastMessage.textContent = message;
+                toast.className = `toast ${type}`;
+                
+                if (type === 'success') {
+                    toastIcon.className = 'fas fa-check-circle';
+                } else if (type === 'error') {
+                    toastIcon.className = 'fas fa-exclamation-circle';
+                }
+                
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            },
+
+            showLoading() {
+                document.getElementById('loading-overlay').style.display = 'flex';
+            },
+
+            hideLoading() {
+                document.getElementById('loading-overlay').style.display = 'none';
+            },
+
+            titleCase(str) {
+                return str.replace(/\w\S*/g, function(txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                }).replace(/_/g, ' ');
+            },
+
+            formatDate(dateString) {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+        };
+
+        // Authentication functions
+        const auth = {
+            async isAuthenticated() {
+                try {
+                    console.log('🔐 Checking authentication...');
+                    const response = await fetch('/api/check-auth', {
+                        credentials: 'include'
+                    });
+                    
+                    if (!response.ok) {
+                        console.warn('⚠️ Auth check failed with status:', response.status);
+                        return false;
+                    }
+                    
+                    const data = await response.json();
+                    console.log('🔐 Auth response:', data);
+                    
+                    const isAuth = data.authenticated && data.user_type === 'department';
+                    console.log('🔐 Is authenticated as department:', isAuth);
+                    
+                    return isAuth;
+                } catch (error) {
+                    console.error('❌ Auth check error:', error);
+                    return false;
+                }
+            },
+
+            redirectToLogin() {
+                console.log('🔄 Redirecting to login...');
+                window.location.href = 'login.html';
+            },
+
+            async logout() {
+                try {
+                    await fetch('/logout', {
+                        credentials: 'include'
+                    });
+                    this.redirectToLogin();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    this.redirectToLogin();
+                }
+            }
+        };
+
+        // API functions
+        const api = {
+            async fetchDepartmentData() {
+                try {
+                    console.log('🔍 Fetching department data from /api/department/current');
+                    const response = await fetch('/api/department/current', {
+                        credentials: 'include'
+                    });
+                    
+                    console.log('📥 Response status:', response.status);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('✅ Department data received:', data);
+                        return data.department;
+                    } else {
+                        const errorText = await response.text();
+                        console.error('❌ Failed to fetch department data:', errorText);
+                        throw new Error('Failed to fetch department data');
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching department data:', error);
+                    throw error;
+                }
+            },
+
+            async fetchDepartmentPetitions(departmentName) {
+                try {
+                    console.log('🔍 Fetching petitions for department:', departmentName);
+                    const response = await fetch(`/api/department/petitions/${encodeURIComponent(departmentName)}`, {
+                        credentials: 'include'
+                    });
+                    
+                    console.log('📥 Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                        console.error('❌ Failed to fetch department petitions:', errorData);
+                        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('✅ Petitions received:', data.petitions?.length || 0);
+                    
+                    if (!data.petitions) {
+                        console.warn('⚠️ No petitions array in response');
+                        return { petitions: [] };
+                    }
+                    
+                    return data;
+                } catch (error) {
+                    console.error('❌ Error fetching department petitions:', error);
+                    console.error('Error type:', error.constructor.name);
+                    console.error('Error message:', error.message);
+                    throw error;
+                }
+            },
+
+            async updatePetitionStatus(ticketId, status) {
+                try {
+                    const response = await fetch(`/api/petitions/${ticketId}/status`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status })
+                    });
+                    
+                    if (response.ok) {
+                        return await response.json();
+                    } else {
+                        throw new Error('Failed to update petition status');
+                    }
+                } catch (error) {
+                    console.error('Error updating petition status:', error);
+                    throw error;
+                }
+            }
+        };
+
+        // Dashboard functions
+        const dashboard = {
+            department: null,
+            petitions: [],
+            pendingStatusUpdate: null,
+
+            async initialize() {
+                try {
+                    console.log('🚀 Starting dashboard initialization...');
+                    utils.showLoading();
+                    
+                    // Check authentication
+                    console.log('📋 Step 1: Checking authentication...');
+                    const isAuth = await auth.isAuthenticated();
+                    
+                    if (!isAuth) {
+                        console.warn('⚠️ Not authenticated or not a department user');
+                        utils.showToast('Please log in as a department user', 'error');
+                        setTimeout(() => {
+                            auth.redirectToLogin();
+                        }, 2000);
+                        return;
+                    }
+                    
+                    console.log('✅ Authentication verified');
+                    
+                    // Load department data
+                    console.log('📋 Step 2: Loading department data...');
+                    await this.loadDepartmentData();
+                    console.log('✅ Department data loaded');
+                    
+                    // Load department stats and petitions
+                    console.log('📋 Step 3: Loading petitions...');
+                    await this.loadDepartmentStats();
+                    console.log('✅ Petitions loaded');
+                    
+                    // Set up event listeners
+                    console.log('📋 Step 4: Setting up event listeners...');
+                    this.setupEventListeners();
+                    console.log('✅ Event listeners set up');
+                    
+                    utils.showToast('Dashboard loaded successfully', 'success');
+                    console.log('🎉 Dashboard initialization complete!');
+                    
+                } catch (error) {
+                    console.error('❌ Dashboard initialization error:', error);
+                    console.error('Error details:', {
+                        message: error.message,
+                        stack: error.stack
+                    });
+                    utils.showToast(`Failed to load dashboard: ${error.message}`, 'error');
+                } finally {
+                    utils.hideLoading();
+                }
+            },
+
+            async loadDepartmentData() {
+                try {
+                    console.log('📊 Loading department data...');
+                    const data = await api.fetchDepartmentData();
+                    
+                    if (!data) {
+                        throw new Error('No department data received');
+                    }
+                    
+                    this.department = data;
+                    
+                    console.log('✅ Department loaded:', data.name);
+                    console.log('Department details:', data);
+                    
+                    // Update UI with department info
+                    const deptNameEl = document.getElementById('dept-name');
+                    const deptFullNameEl = document.getElementById('dept-full-name');
+                    const deptAvatarEl = document.getElementById('dept-avatar');
+                    
+                    if (deptNameEl) deptNameEl.textContent = data.name || 'Department';
+                    if (deptFullNameEl) deptFullNameEl.textContent = data.name || 'Department';
+                    
+                    if (deptAvatarEl) {
+                        const initials = data.name 
+                            ? data.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                            : 'DE';
+                        deptAvatarEl.textContent = initials;
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Error loading department data:', error);
+                    throw new Error(`Failed to load department data: ${error.message}`);
+                }
+            },
+
+            async loadDepartmentStats() {
+                try {
+                    if (!this.department) {
+                        const error = new Error('Department data not loaded yet');
+                        console.error('⚠️', error.message);
+                        throw error;
+                    }
+                    
+                    if (!this.department.name) {
+                        const error = new Error('Department name is missing');
+                        console.error('⚠️', error.message);
+                        console.error('Department object:', this.department);
+                        throw error;
+                    }
+                    
+                    console.log('📊 Loading petitions for:', this.department.name);
+                    const data = await api.fetchDepartmentPetitions(this.department.name);
+                    
+                    if (!data || !Array.isArray(data.petitions)) {
+                        console.warn('⚠️ Invalid petition data received:', data);
+                        this.petitions = [];
+                    } else {
+                        this.petitions = data.petitions;
+                    }
+                    
+                    console.log('✅ Loaded', this.petitions.length, 'petitions');
+                    
+                    // If no petitions, show friendly message
+                    if (this.petitions.length === 0) {
+                        console.log('ℹ️ No petitions found for this department');
+                    }
+                    
+                    // Calculate stats
+                    const assigned = this.petitions.length;
+                    const pending = this.petitions.filter(p => p.status === 'pending').length;
+                    const inProgress = this.petitions.filter(p => p.status === 'in_progress').length;
+                    const overdue = this.petitions.filter(p => {
+                        const created = new Date(p.created_at);
+                        const now = new Date();
+                        const diffDays = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+                        return diffDays > 30 && p.status !== 'resolved' && p.status !== 'rejected';
+                    }).length;
+                    
+                    console.log('📈 Stats - Assigned:', assigned, 'Pending:', pending, 'In Progress:', inProgress, 'Overdue:', overdue);
+                    
+                    // Update stats cards with animation
+                    this.animateCounter('assigned-petitions', assigned);
+                    this.animateCounter('pending-petitions', pending);
+                    this.animateCounter('progress-petitions', inProgress);
+                    this.animateCounter('overdue-petitions', overdue);
+                    
+                    // Display petitions
+                    this.displayPetitions(this.petitions);
+                } catch (error) {
+                    console.error('❌ Error loading department stats:', error);
+                    throw new Error(`Failed to load petitions: ${error.message}`);
+                }
+            },
+
+            animateCounter(elementId, targetValue) {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+                
+                const startValue = parseInt(element.textContent) || 0;
+                const duration = 500; // ms
+                const startTime = performance.now();
+                
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
+                    element.textContent = currentValue;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            },
+
+            displayPetitions(petitions) {
+                console.log('📋 Displaying', petitions?.length || 0, 'petitions');
+                const tbody = document.getElementById('petitions-tbody');
+                const emptyState = document.getElementById('empty-state');
+                
+                if (petitions && petitions.length > 0) {
+                    tbody.innerHTML = '';
+                    emptyState.style.display = 'none';
+                    
+                    petitions.slice(0, 50).forEach((petition, index) => {
+                        const row = document.createElement('tr');
+                        row.style.animation = `fadeIn 0.3s ease-in-out ${index * 0.05}s both`;
+                        
+                        // Build status dropdown based on current status
+                        let statusOptions = '';
+                        const statuses = ['pending', 'in_progress', 'resolved', 'rejected'];
+                        statuses.forEach(s => {
+                            const selected = s === petition.status ? 'selected' : '';
+                            const displayName = utils.titleCase(s.replace('_', ' '));
+                            statusOptions += `<option value="${s}" ${selected}>${displayName}</option>`;
+                        });
+                        
+                        // Truncate title if too long
+                        const displayTitle = petition.title.length > 50 
+                            ? petition.title.substring(0, 47) + '...' 
+                            : petition.title;
+                        
+                        row.innerHTML = `
+                            <td><strong>${petition.ticket_id}</strong></td>
+                            <td title="${petition.title}">${displayTitle}</td>
+                            <td><span class="badge badge-info">${petition.category}</span></td>
+                            <td>${utils.formatDate(petition.created_at)}</td>
+                            <td><span class="priority priority-${petition.urgency || 'medium'}">${utils.titleCase(petition.urgency || 'medium')}</span></td>
+                            <td>
+                                <select class="status-select" 
+                                        data-old-status="${petition.status}"
+                                        onchange="dashboard.updateStatus('${petition.ticket_id}', this.value, this)">
+                                    ${statusOptions}
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-outline btn-sm" onclick="dashboard.viewPetition('${petition.ticket_id}')" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    tbody.innerHTML = '';
+                    emptyState.style.display = 'block';
+                }
+            },
+
+            setupEventListeners() {
+                // Status filter
+                document.getElementById('status-filter').addEventListener('change', (e) => {
+                    this.filterPetitionsByStatus(e.target.value);
+                });
+
+                // Search functionality
+                document.getElementById('search-input').addEventListener('input', (e) => {
+                    this.filterPetitionsBySearch(e.target.value);
+                });
+
+                // Refresh button
+                document.getElementById('refresh-btn').addEventListener('click', () => {
+                    this.loadDepartmentStats();
+                });
+
+                // Logout
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    auth.logout();
+                });
+            },
+
+            filterPetitionsByStatus(status) {
+                let filtered = this.petitions;
+                
+                if (status) {
+                    filtered = filtered.filter(p => p.status === status);
+                }
+                
+                this.displayPetitions(filtered);
+            },
+
+            filterPetitionsBySearch(searchTerm) {
+                let filtered = this.petitions;
+                
+                if (searchTerm) {
+                    const term = searchTerm.toLowerCase();
+                    filtered = filtered.filter(p => 
+                        p.title.toLowerCase().includes(term) || 
+                        p.ticket_id.toLowerCase().includes(term) ||
+                        p.category.toLowerCase().includes(term)
+                    );
+                }
+                
+                this.displayPetitions(filtered);
+            },
+
+            async updateStatus(ticketId, status, selectElement) {
+                // Get old status from the select element
+                const oldStatus = selectElement.getAttribute('data-old-status') || selectElement.value;
+                
+                // If status hasn't changed, do nothing
+                if (oldStatus === status) {
+                    return;
+                }
+                
+                // Store the pending update info
+                this.pendingStatusUpdate = {
+                    ticketId,
+                    oldStatus,
+                    newStatus: status,
+                    selectElement
+                };
+                
+                // Find petition details
+                const petition = this.petitions.find(p => p.ticket_id === ticketId);
+                
+                // Show beautiful confirmation modal
+                this.showStatusUpdateModal(petition, oldStatus, status);
+            },
+            
+            showStatusUpdateModal(petition, oldStatus, newStatus) {
+                const modal = document.getElementById('status-modal');
+                const modalBody = document.getElementById('status-modal-body');
+                
+                const oldStatusText = utils.titleCase(oldStatus.replace('_', ' '));
+                const newStatusText = utils.titleCase(newStatus.replace('_', ' '));
+                
+                modalBody.innerHTML = `
+                    <div class="status-update-card">
+                        <h3 style="margin: 0 0 1rem 0; color: var(--dark);">
+                            <i class="fas fa-file-alt"></i> ${petition.title}
+                        </h3>
+                        
+                        <div class="status-update-row">
+                            <span class="status-label">Ticket ID:</span>
+                            <strong>${petition.ticket_id}</strong>
+                        </div>
+                        
+                        <div class="status-update-row">
+                            <span class="status-label">Category:</span>
+                            <strong>${petition.category}</strong>
+                        </div>
+                        
+                        <div class="status-update-row">
+                            <span class="status-label">Priority:</span>
+                            <span class="urgency-badge ${petition.urgency}">${utils.titleCase(petition.urgency)}</span>
+                        </div>
+                        
+                        <div class="status-update-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                            <span class="status-label">Status Change:</span>
+                            <div class="status-change">
+                                <span class="status-old">${oldStatusText}</span>
+                                <i class="fas fa-arrow-right status-arrow"></i>
+                                <span class="status-new">${newStatusText}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${newStatus === 'rejected' ? `
+                    <div class="rejection-reason-input" style="margin-top: 1.5rem;">
+                        <label for="rejection-reason-textarea" style="display: block; color: #495057; font-weight: 600; margin-bottom: 0.75rem; font-size: 1rem;">
+                            <i class="fas fa-comment-dots"></i> Rejection Reason <span style="color: red;">*</span>
+                        </label>
+                        <textarea id="rejection-reason-textarea" class="form-control" rows="4" 
+                            style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 0.95rem; font-family: inherit; resize: vertical;"
+                            placeholder="Please provide a detailed reason for rejecting this petition..."></textarea>
+                        <small style="color: #6c757d; margin-top: 5px; display: block;">This will be sent to the student via email and displayed in their dashboard.</small>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="status-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <p><strong>Important:</strong> The petitioner will be notified via email about this status change.</p>
+                            ${newStatus === 'resolved' ? '<p style="margin-top: 0.5rem;"><strong>Note:</strong> This will mark the petition as completed and close it.</p>' : ''}
+                            ${newStatus === 'rejected' ? '<p style="margin-top: 0.5rem; color: #e74c3c;"><strong>Note:</strong> Please provide a clear explanation for the rejection.</p>' : ''}
+                        </div>
+                    </div>
+                `;
+                
+                modal.classList.add('active');
+            },
+            
+            async confirmStatusUpdate() {
+                if (!this.pendingStatusUpdate) return;
+                
+                const { ticketId, newStatus, selectElement } = this.pendingStatusUpdate;
+                
+                // Check if rejection reason is required
+                let rejectionReason = null;
+                if (newStatus === 'rejected') {
+                    const reasonTextarea = document.getElementById('rejection-reason-textarea');
+                    rejectionReason = reasonTextarea ? reasonTextarea.value.trim() : '';
+                    
+                    if (!rejectionReason) {
+                        utils.showToast('Please provide a rejection reason', 'error');
+                        return;
+                    }
+                }
+                
+                try {
+                    // Hide modal first
+                    document.getElementById('status-modal').classList.remove('active');
+                    
+                    utils.showLoading();
+                    
+                    // Build request body
+                    const requestBody = { status: newStatus };
+                    if (rejectionReason) {
+                        requestBody.rejection_reason = rejectionReason;
+                    }
+                    
+                    // Make API call with rejection reason if needed
+                    const response = await fetch(`/api/petitions/${ticketId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to update status');
+                    }
+                    
+                    // Store the new status as old for next change
+                    selectElement.setAttribute('data-old-status', newStatus);
+                    
+                    utils.showToast(`Petition ${ticketId} status updated successfully. User notified via email.`, 'success');
+                    await this.loadDepartmentStats(); // Reload data
+                    
+                    // Clear pending update
+                    this.pendingStatusUpdate = null;
+                } catch (error) {
+                    console.error('Error updating status:', error);
+                    utils.showToast('Failed to update petition status', 'error');
+                    // Revert the select to old status
+                    selectElement.value = this.pendingStatusUpdate.oldStatus;
+                } finally {
+                    utils.hideLoading();
+                }
+            },
+            
+            cancelStatusUpdate() {
+                if (this.pendingStatusUpdate) {
+                    // Revert the select to old status
+                    this.pendingStatusUpdate.selectElement.value = this.pendingStatusUpdate.oldStatus;
+                    this.pendingStatusUpdate = null;
+                }
+                
+                // Hide modal
+                document.getElementById('status-modal').classList.remove('active');
+            },
+
+            viewPetition(ticketId) {
+                // Find the petition
+                const petition = this.petitions.find(p => p.ticket_id === ticketId);
+                if (!petition) {
+                    utils.showToast('Petition not found', 'error');
+                    return;
+                }
+                
+                const statusDisplay = utils.titleCase(petition.status.replace('_', ' '));
+                const urgencyDisplay = utils.titleCase(petition.urgency || 'medium');
+                
+                // Create beautiful card layout
+                const modalBody = document.getElementById('petition-modal-body');
+                modalBody.innerHTML = `
+                    <!-- Ticket Info Card -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <i class="fas fa-ticket-alt"></i>
+                            Ticket Information
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-barcode"></i>
+                                Ticket ID
+                            </div>
+                            <div class="detail-value"><strong>${petition.ticket_id}</strong></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-heading"></i>
+                                Title
+                            </div>
+                            <div class="detail-value"><strong>${petition.title}</strong></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-tag"></i>
+                                Category
+                            </div>
+                            <div class="detail-value">${petition.category}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-building"></i>
+                                Department
+                            </div>
+                            <div class="detail-value">${petition.department}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Location
+                            </div>
+                            <div class="detail-value">${petition.location}</div>
+                        </div>
+                    </div>
+
+                    <!-- Description Card -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <i class="fas fa-align-left"></i>
+                            Description
+                        </div>
+                        <div class="description-box">
+                            ${petition.description}
+                        </div>
+                    </div>
+
+                    <!-- Status & Priority Card -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <i class="fas fa-info-circle"></i>
+                            Status & Priority
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-flag"></i>
+                                Status
+                            </div>
+                            <div class="detail-value">
+                                <span class="status-badge ${petition.status.replace('_', '-')}">
+                                    <i class="fas fa-circle"></i>
+                                    ${statusDisplay}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-thermometer-half"></i>
+                                Urgency
+                            </div>
+                            <div class="detail-value">
+                                <span class="urgency-badge ${petition.urgency || 'medium'}">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    ${urgencyDisplay}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submitter Info Card -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <i class="fas fa-user"></i>
+                            Submitter Information
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-user-circle"></i>
+                                Name
+                            </div>
+                            <div class="detail-value">${petition.full_name}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </div>
+                            <div class="detail-value">${petition.email}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-phone"></i>
+                                Phone
+                            </div>
+                            <div class="detail-value">${petition.phone || 'N/A'}</div>
+                        </div>
+                        ${petition.address ? `
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-home"></i>
+                                Address
+                            </div>
+                            <div class="detail-value">${petition.address}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Timeline Card -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <i class="fas fa-clock"></i>
+                            Timeline
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-calendar-plus"></i>
+                                Submitted
+                            </div>
+                            <div class="detail-value">${utils.formatDate(petition.created_at)}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                <i class="fas fa-calendar-check"></i>
+                                Last Updated
+                            </div>
+                            <div class="detail-value">${utils.formatDate(petition.updated_at)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show the modal
+                document.getElementById('petition-modal').style.display = 'block';
+            },
+
+            closeModal() {
+                document.getElementById('petition-modal').style.display = 'none';
+            }
+        };
+
+        // ============= NOTIFICATION SYSTEM =============
+        const notifications = {
+            polling: null,
+            isDropdownOpen: false,
+
+            async init() {
+                console.log('🔔 Initializing notification system...');
+                
+                // Fetch initial notifications
+                await this.fetchNotifications();
+                
+                // Set up polling every 30 seconds
+                this.polling = setInterval(() => {
+                    this.fetchNotifications();
+                }, 30000);
+                
+                // Set up event listeners
+                this.setupEventListeners();
+            },
+
+            setupEventListeners() {
+                // Bell icon click - toggle dropdown
+                document.getElementById('notification-bell').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleDropdown();
+                });
+
+                // Mark all as read button
+                document.getElementById('mark-all-read').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.markAllAsRead();
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    const dropdown = document.getElementById('notification-dropdown');
+                    const bell = document.getElementById('notification-bell');
+                    
+                    if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                        this.closeDropdown();
+                    }
+                });
+            },
+
+            toggleDropdown() {
+                const dropdown = document.getElementById('notification-dropdown');
+                
+                if (this.isDropdownOpen) {
+                    this.closeDropdown();
+                } else {
+                    dropdown.classList.add('show');
+                    this.isDropdownOpen = true;
+                    console.log('🔔 Notification dropdown opened');
+                }
+            },
+
+            closeDropdown() {
+                const dropdown = document.getElementById('notification-dropdown');
+                dropdown.classList.remove('show');
+                this.isDropdownOpen = false;
+            },
+
+            async fetchNotifications() {
+                try {
+                    const response = await fetch('/api/notifications', {
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            console.log('❌ Not authenticated for notifications');
+                            return;
+                        }
+                        throw new Error('Failed to fetch notifications');
+                    }
+
+                    const data = await response.json();
+                    console.log(`📬 Fetched ${data.count} notifications (${data.unread_count} unread)`);
+                    
+                    this.updateBadge(data.unread_count);
+                    this.renderNotifications(data.notifications);
+                    
+                } catch (error) {
+                    console.error('❌ Error fetching notifications:', error);
+                }
+            },
+
+            updateBadge(count) {
+                const badge = document.getElementById('notification-count');
+                
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            },
+
+            renderNotifications(notificationList) {
+                const container = document.getElementById('notification-list');
+                
+                if (!notificationList || notificationList.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-notifications">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>No new notifications</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = notificationList.map(notif => `
+                    <div class="notification-item ${notif.read ? '' : 'unread'}" 
+                         data-id="${notif.id}"
+                         onclick="notifications.handleNotificationClick('${notif.id}', '${notif.ticket_id}')">
+                        <div class="notif-header">
+                            <div>
+                                <div class="notif-title">${notif.title}</div>
+                                <div class="notif-details">
+                                    <span class="notif-ticket">#${notif.ticket_id}</span>
+                                    <span class="notif-urgency ${notif.urgency}">${notif.urgency.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div class="notif-time">${this.getTimeAgo(notif.timestamp)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            async handleNotificationClick(notificationId, ticketId) {
+                console.log(`🔔 Notification clicked: ${notificationId}`);
+                
+                // Mark as read
+                await this.markAsRead(notificationId);
+                
+                // Close dropdown
+                this.closeDropdown();
+                
+                // Find and show the petition in the table
+                const petitionRow = document.querySelector(`tr[data-ticket-id="${ticketId}"]`);
+                if (petitionRow) {
+                    petitionRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    petitionRow.style.backgroundColor = '#fff3cd';
+                    setTimeout(() => {
+                        petitionRow.style.backgroundColor = '';
+                    }, 2000);
+                }
+            },
+
+            async markAsRead(notificationId) {
+                try {
+                    const response = await fetch(`/api/notifications/${notificationId}/read`, {
+                        method: 'PUT',
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        console.log(`✅ Notification ${notificationId} marked as read`);
+                        await this.fetchNotifications();
+                    }
+                } catch (error) {
+                    console.error('❌ Error marking notification as read:', error);
+                }
+            },
+
+            async markAllAsRead() {
+                try {
+                    const response = await fetch('/api/notifications/mark-all-read', {
+                        method: 'PUT',
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        console.log('✅ All notifications marked as read');
+                        await this.fetchNotifications();
+                        utils.showToast('All notifications marked as read', 'success');
+                    }
+                } catch (error) {
+                    console.error('❌ Error marking all notifications as read:', error);
+                    utils.showToast('Failed to mark all as read', 'error');
+                }
+            },
+
+            getTimeAgo(timestamp) {
+                const now = new Date();
+                const date = new Date(timestamp);
+                const seconds = Math.floor((now - date) / 1000);
+
+                if (seconds < 60) return 'Just now';
+                if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+                if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+                if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+                
+                return date.toLocaleDateString();
+            },
+
+            destroy() {
+                if (this.polling) {
+                    clearInterval(this.polling);
+                    console.log('🔔 Notification polling stopped');
+                }
+            }
+        };
+
+        // Initialize the dashboard when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing Department Dashboard...');
+            console.log('📍 Current URL:', window.location.href);
+            console.log('🍪 Cookies:', document.cookie);
+            dashboard.initialize();
+            
+            // Initialize notification system
+            notifications.init();
+            
+            // Close modal when clicking outside
+            const petitionModal = document.getElementById('petition-modal');
+            const statusModal = document.getElementById('status-modal');
+            
+            window.onclick = function(event) {
+                if (event.target === petitionModal) {
+                    dashboard.closeModal();
+                }
+                if (event.target === statusModal) {
+                    dashboard.cancelStatusUpdate();
+                }
+            };
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    dashboard.closeModal();
+                    dashboard.cancelStatusUpdate();
+                }
+            });
+            
+            // Clean up on page unload
+            window.addEventListener('beforeunload', () => {
+                notifications.destroy();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | Petition Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/custom.css">
+    <style>
+        /* Reuse the same CSS variables and base styles */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: var(--gray);
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+        
+        .profile-sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .profile-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-info p {
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .join-date {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 1rem;
+        }
+        
+        .profile-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section-header h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .form-control:read-only {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert-success {
+            background: rgba(76, 201, 240, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        
+        .alert-error {
+            background: rgba(247, 37, 133, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        .alert-hidden {
+            display: none;
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.95), rgba(114, 9, 183, 0.95));
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .loading-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        .loading-spinner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+        }
+        
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+        
+        .spinner-ring:nth-child(1) {
+            border-top-color: #fff;
+            border-right-color: #fff;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner-ring:nth-child(2) {
+            border-bottom-color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(255, 255, 255, 0.6);
+            animation: spin 2s linear infinite reverse;
+        }
+        
+        .spinner-ring:nth-child(3) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-top-color: rgba(255, 255, 255, 0.4);
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Footer */
+        footer {
+            background-color: white;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--gray);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .profile-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-file-signature"></i>
+                    <h1>Petition Management System</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="submit-petition.html">Submit Petition</a></li>
+                        <li><a href="track-petition.html">Track Petition</a></li>
+                        <li><a href="profile.html" class="active">Profile</a></li>
+                    </ul>
+                </nav>
+                <div class="user-actions">
+                    <div class="user-profile">
+                        <div class="avatar" id="user-avatar">U</div>
+                        <span id="user-name">Loading...</span>
+                    </div>
+                    <a href="/logout" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.5);">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h2>Your Profile</h2>
+                <p>Manage your personal information and account settings.</p>
+            </div>
+
+            <div class="profile-section">
+                <!-- Profile Sidebar -->
+                <div class="profile-sidebar">
+                    <div class="profile-avatar" id="profile-avatar">JS</div>
+                    <div class="profile-info">
+                        <h3 id="profile-name">John Smith</h3>
+                        <p id="profile-email">john@example.com</p>
+                        <p id="profile-phone">+1 234 567 8900</p>
+                        <div class="join-date">
+                            Member since <span id="join-date">January 2023</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="profile-content">
+                    <div class="section-header">
+                        <h3>Personal Information</h3>
+                        <button class="btn btn-outline" id="edit-toggle">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                    </div>
+
+                    <div id="alert-message" class="alert alert-hidden"></div>
+
+                    <form id="profile-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" class="form-control" required readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" class="form-control" required readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <input type="text" id="address" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" id="cancel-edit" style="display: none;">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="save-changes" style="display: none;">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Petition Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="loading-text">Loading Profile</div>
+            <div class="loading-subtext">Fetching your profile information...</div>
+        </div>
+    </div>
+
+    <script>
+        let isEditing = false;
+        let originalData = {};
+
+        // Utility functions
+        const utils = {
+            showAlert(message, type) {
+                const alert = document.getElementById('alert-message');
+                alert.textContent = message;
+                alert.className = `alert alert-${type}`;
+                alert.style.display = 'block';
+                
+                if (type === 'success') {
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 3000);
+                }
+            },
+
+            hideAlert() {
+                document.getElementById('alert-message').style.display = 'none';
+            },
+
+            showLoading() {
+                document.getElementById('loading-overlay').style.display = 'flex';
+            },
+
+            hideLoading() {
+                document.getElementById('loading-overlay').style.display = 'none';
+            }
+        };
+
+        // Authentication functions
+        const auth = {
+            async checkAuth() {
+                try {
+                    const response = await fetch('/api/check-auth', {
+                        credentials: 'include'
+                    });
+                    const data = await response.json();
+                    
+                    if (!data.authenticated) {
+                        window.location.href = 'login.html';
+                        return false;
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('Auth check failed:', error);
+                    window.location.href = 'login.html';
+                    return false;
+                }
+            },
+
+            async logout() {
+                try {
+                    await fetch('/logout', {
+                        credentials: 'include'
+                    });
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                    window.location.href = 'login.html';
+                }
+            }
+        };
+
+        // API functions
+        const api = {
+            async getCurrentUser() {
+                try {
+                    const response = await fetch('/api/current-user', {
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        return await response.json();
+                    } else {
+                        throw new Error('Failed to get current user');
+                    }
+                } catch (error) {
+                    console.error('Error getting current user:', error);
+                    throw error;
+                }
+            },
+
+            async getUserProfile(userId) {
+                try {
+                    const response = await fetch(`/api/profile/${userId}`, {
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        return await response.json();
+                    } else {
+                        throw new Error('Failed to get user profile');
+                    }
+                } catch (error) {
+                    console.error('Error getting user profile:', error);
+                    throw error;
+                }
+            },
+
+            async updateUserProfile(userId, profileData) {
+                try {
+                    const response = await fetch(`/api/profile/${userId}`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(profileData)
+                    });
+                    
+                    if (response.ok) {
+                        return await response.json();
+                    } else {
+                        throw new Error('Failed to update profile');
+                    }
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    throw error;
+                }
+            }
+        };
+
+        // Profile functions
+        const profile = {
+            currentUser: null,
+
+            async initialize() {
+                try {
+                    utils.showLoading();
+                    
+                    // Check authentication
+                    if (!await auth.checkAuth()) {
+                        return;
+                    }
+                    
+                    // Load current user data
+                    await this.loadCurrentUser();
+                    
+                    // Load user profile
+                    await this.loadUserProfile();
+                    
+                    // Set up event listeners
+                    this.setupEventListeners();
+                    
+                } catch (error) {
+                    console.error('Profile initialization error:', error);
+                    utils.showAlert('Failed to load profile data', 'error');
+                } finally {
+                    utils.hideLoading();
+                }
+            },
+
+            async loadCurrentUser() {
+                try {
+                    this.currentUser = await api.getCurrentUser();
+                    
+                    // Update header
+                    document.getElementById('user-name').textContent = this.currentUser.name;
+                    document.getElementById('user-avatar').textContent = 
+                        this.currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                } catch (error) {
+                    console.error('Error loading current user:', error);
+                    throw error;
+                }
+            },
+
+            async loadUserProfile() {
+                try {
+                    if (!this.currentUser) return;
+                    
+                    const profileData = await api.getUserProfile(this.currentUser.id);
+                    this.displayProfileData(profileData);
+                    originalData = { ...profileData };
+                } catch (error) {
+                    console.error('Error loading user profile:', error);
+                    throw error;
+                }
+            },
+
+            displayProfileData(data) {
+                // Update form fields
+                document.getElementById('name').value = data.name;
+                document.getElementById('email').value = data.email;
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('address').value = data.address || '';
+                
+                // Update profile sidebar
+                document.getElementById('profile-name').textContent = data.name;
+                document.getElementById('profile-email').textContent = data.email;
+                document.getElementById('profile-phone').textContent = data.phone || 'Not provided';
+                document.getElementById('profile-avatar').textContent = 
+                    data.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                
+                // Update join date
+                if (data.joined_date) {
+                    const joinDate = new Date(data.joined_date);
+                    document.getElementById('join-date').textContent = joinDate.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long'
+                    });
+                }
+            },
+
+            setupEventListeners() {
+                // Edit toggle event
+                document.getElementById('edit-toggle').addEventListener('click', () => {
+                    this.toggleEditMode();
+                });
+                
+                // Cancel edit event
+                document.getElementById('cancel-edit').addEventListener('click', () => {
+                    this.toggleEditMode();
+                });
+                
+                // Form submission
+                document.getElementById('profile-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveProfileChanges();
+                });
+
+                // Logout
+                document.querySelector('a[href="/logout"]').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    auth.logout();
+                });
+            },
+
+            toggleEditMode() {
+                isEditing = !isEditing;
+                const inputs = document.querySelectorAll('#profile-form input');
+                const editToggle = document.getElementById('edit-toggle');
+                const cancelBtn = document.getElementById('cancel-edit');
+                const saveBtn = document.getElementById('save-changes');
+                
+                if (isEditing) {
+                    // Enable editing
+                    inputs.forEach(input => {
+                        if (input.id !== 'email') { // Don't allow email editing
+                            input.readOnly = false;
+                        }
+                    });
+                    editToggle.innerHTML = '<i class="fas fa-times"></i> Cancel Edit';
+                    editToggle.classList.remove('btn-outline');
+                    editToggle.classList.add('btn-primary');
+                    cancelBtn.style.display = 'inline-block';
+                    saveBtn.style.display = 'inline-block';
+                } else {
+                    // Disable editing and reset form
+                    inputs.forEach(input => input.readOnly = true);
+                    this.displayProfileData(originalData); // Reset to original data
+                    editToggle.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+                    editToggle.classList.remove('btn-primary');
+                    editToggle.classList.add('btn-outline');
+                    cancelBtn.style.display = 'none';
+                    saveBtn.style.display = 'none';
+                    utils.hideAlert();
+                }
+            },
+
+            async saveProfileChanges() {
+                const formData = {
+                    name: document.getElementById('name').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value
+                };
+                
+                try {
+                    utils.showLoading();
+                    
+                    await api.updateUserProfile(this.currentUser.id, formData);
+                    
+                    utils.showAlert('Profile updated successfully!', 'success');
+                    originalData = { ...originalData, ...formData };
+                    this.toggleEditMode(); // Exit edit mode
+                    await this.loadCurrentUser(); // Reload to get updated data
+                    await this.loadUserProfile(); // Reload profile data
+                    
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    utils.showAlert('Error updating profile. Please try again.', 'error');
+                } finally {
+                    utils.hideLoading();
+                }
+            }
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            profile.initialize();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Widget Demo | Petition Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+        
+        .demo-section {
+            margin-bottom: 2rem;
+        }
+        
+        .demo-section h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .demo-btn {
+            padding: 1.2rem 2rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .demo-btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #06d6a0, var(--success));
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff006e, var(--danger));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+        
+        .features {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .features h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            padding: 0.5rem;
+        }
+        
+        .feature-list li i {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+        
+        /* Loading Overlay - Same as main app */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.95), rgba(114, 9, 183, 0.95));
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        .loading-spinner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+        }
+        
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+        
+        .spinner-ring:nth-child(1) {
+            border-top-color: #fff;
+            border-right-color: #fff;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner-ring:nth-child(2) {
+            border-bottom-color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(255, 255, 255, 0.6);
+            animation: spin 2s linear infinite reverse;
+        }
+        
+        .spinner-ring:nth-child(3) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-top-color: rgba(255, 255, 255, 0.4);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .code-section {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+        
+        .code-section pre {
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .code-section .comment {
+            color: #6a9955;
+        }
+        
+        .code-section .keyword {
+            color: #569cd6;
+        }
+        
+        .code-section .string {
+            color: #ce9178;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-spinner fa-pulse"></i> Loading Widget Demo</h1>
+            <p>Experience the beautiful new loading overlay with gradient effects</p>
+        </div>
+        
+        <div class="demo-section">
+            <h2><i class="fas fa-play-circle"></i> Try Different Loading Scenarios</h2>
+            <p>Click any button below to see the loading widget in action</p>
+            
+            <div class="demo-grid">
+                <button class="demo-btn btn-primary" onclick="showLoading('Processing Request', 'Please wait while we handle your request...', 2000)">
+                    <i class="fas fa-sync"></i>
+                    Quick Load (2s)
+                </button>
+                
+                <button class="demo-btn btn-success" onclick="showLoading('Fetching Data', 'Retrieving information from the server...', 3000)">
+                    <i class="fas fa-database"></i>
+                    Medium Load (3s)
+                </button>
+                
+                <button class="demo-btn btn-danger" onclick="showLoading('Processing...', 'This may take a moment...', 5000)">
+                    <i class="fas fa-hourglass-half"></i>
+                    Long Load (5s)
+                </button>
+                
+                <button class="demo-btn btn-secondary" onclick="showLoading('Authenticating', 'Verifying your credentials...', 2500)">
+                    <i class="fas fa-user-shield"></i>
+                    Auth Load (2.5s)
+                </button>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h3><i class="fas fa-star"></i> Features</h3>
+            <ul class="feature-list">
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Beautiful gradient background</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Triple-ring animated spinner</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Bouncing dots effect</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Backdrop blur glassmorphism</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Smooth fade-in animation</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Context-specific messages</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>GPU-accelerated performance</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Cross-browser compatible</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="code-section">
+            <pre><span class="comment">// Usage in your code:</span>
+<span class="keyword">function</span> <span class="keyword">showLoading</span>() {
+    document.getElementById(<span class="string">'loading-overlay'</span>).style.display = <span class="string">'flex'</span>;
+}
+
+<span class="keyword">function</span> <span class="keyword">hideLoading</span>() {
+    document.getElementById(<span class="string">'loading-overlay'</span>).style.display = <span class="string">'none'</span>;
+}
+
+<span class="comment">// Example: API call with loading</span>
+showLoading();
+<span class="keyword">try</span> {
+    <span class="keyword">const</span> response = <span class="keyword">await</span> fetch(<span class="string">'/api/endpoint'</span>);
+    <span class="keyword">const</span> data = <span class="keyword">await</span> response.json();
+} <span class="keyword">finally</span> {
+    hideLoading();
+}</pre>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="loading-text" id="loading-text">Loading</div>
+            <div class="loading-subtext" id="loading-subtext">Please wait...</div>
+        </div>
+    </div>
+    
+    <script>
+        function showLoading(mainText, subText, duration) {
+            const overlay = document.getElementById('loading-overlay');
+            const textElement = document.getElementById('loading-text');
+            const subtextElement = document.getElementById('loading-subtext');
+            
+            // Update text
+            textElement.textContent = mainText;
+            subtextElement.textContent = subText;
+            
+            // Show overlay
+            overlay.classList.add('show');
+            
+            // Hide after duration
+            setTimeout(() => {
+                overlay.classList.remove('show');
+            }, duration);
+        }
+        
+        // Demo on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                showLoading('Welcome!', 'Loading demo page...', 1500);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

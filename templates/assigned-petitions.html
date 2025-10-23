@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Petitions | Department Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            display: flex;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .dept-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 0;
+        }
+        
+        .dept-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .dept-details h3 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .dept-details p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--success);
+        }
+        
+        .menu-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-title h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .page-title p {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 0.2rem;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+        
+        /* Stats Summary */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+        }
+        
+        .stat-icon.pending-icon {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-icon.progress-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stat-icon.resolved-icon {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .stat-info {
+            flex: 1;
+        }
+        
+        .stat-info h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+            color: #2c3e50;
+        }
+        
+        .stat-info p {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .quick-actions h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .action-btn {
+            padding: 1rem;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .action-btn i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-btn span {
+            display: block;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        /* Petitions Grid */
+        .petitions-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .petitions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .petition-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.2rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: white;
+        }
+        
+        .petition-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .petition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .ticket-id {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .petition-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+        
+        .petition-description {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .petition-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--gray);
+        }
+        
+        .meta-item i {
+            font-size: 0.8rem;
+        }
+        
+        .petition-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-in-progress {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .status-resolved {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-rejected {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .urgency-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .urgency-low {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .urgency-medium {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .urgency-high {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border);
+        }
+        
+        /* Loading & Toast */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.95), rgba(114, 9, 183, 0.95));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .loading-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        .loading-spinner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+        }
+        
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+        
+        .spinner-ring:nth-child(1) {
+            border-top-color: #fff;
+            border-right-color: #fff;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner-ring:nth-child(2) {
+            border-bottom-color: rgba(255, 255, 255, 0.6);
+            border-left-color: rgba(255, 255, 255, 0.6);
+            animation: spin 2s linear infinite reverse;
+        }
+        
+        .spinner-ring:nth-child(3) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-top-color: rgba(255, 255, 255, 0.4);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Petition Details Modal Styles */
+        .petition-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .petition-modal.show {
+            display: flex !important;
+        }
+
+        .petition-modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.4s ease;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .petition-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .petition-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .petition-modal-body {
+            background: white;
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-size: 1rem;
+            line-height: 1.6;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        /* Status Update Modal Styles */
+        .status-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .status-modal.show {
+            display: flex !important;
+        }
+
+        .status-modal-content {
+            background: white;
+            margin: auto;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            position: relative;
+        }
+
+        .status-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .status-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            animation: rotateIcon 2s ease-in-out infinite;
+        }
+
+        .status-icon-wrapper i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .status-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .status-modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .status-detail-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .status-detail-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .status-detail-label {
+            color: #6c757d;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-detail-value {
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .status-select-wrapper {
+            margin-top: 1.5rem;
+        }
+
+        .status-select-wrapper label {
+            display: block;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .status-select-wrapper select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #495057;
+            background-color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .status-select-wrapper select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .rejection-reason-wrapper {
+            margin-top: 1.5rem;
+        }
+        
+        .rejection-reason-wrapper label {
+            display: block;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .rejection-reason-wrapper textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #495057;
+            background-color: white;
+            transition: all 0.3s;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .rejection-reason-wrapper textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        .status-modal-footer {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .status-modal-footer button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateIcon {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(180deg);
+            }
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Checkbox Selection */
+        .petition-checkbox {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            z-index: 10;
+        }
+        
+        .petition-card {
+            position: relative;
+        }
+        
+        .petition-card.selected {
+            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
+        }
+        
+        .bulk-selection-bar {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .bulk-selection-bar.active {
+            display: flex;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .selection-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .selection-count {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .bulk-action-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .bulk-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .bulk-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bulk-btn.cancel {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        
+        /* Bulk Update Modal */
+        .bulk-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bulk-modal.show {
+            display: flex;
+        }
+        
+        .bulk-modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .bulk-modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .bulk-modal-header h3 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .close-bulk-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .close-bulk-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .bulk-modal-body {
+            padding: 2rem;
+        }
+        
+        .selected-petitions-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .selected-petition-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .selected-petition-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .selected-petition-item i {
+            color: var(--primary);
+        }
+        
+        .bulk-status-select {
+            margin-bottom: 1.5rem;
+        }
+        
+        .bulk-status-select label {
+            display: block;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .bulk-status-select select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #495057;
+            background-color: white;
+            transition: all 0.3s;
+        }
+        
+        .bulk-status-select select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .bulk-rejection-reason {
+            display: none;
+            margin-bottom: 1.5rem;
+        }
+        
+        .bulk-rejection-reason.show {
+            display: block;
+        }
+        
+        .bulk-rejection-reason label {
+            display: block;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .bulk-rejection-reason textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .bulk-rejection-reason textarea:focus {
+            outline: none;
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(247, 37, 133, 0.1);
+        }
+        
+        .bulk-modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <h1 id="dept-name">Department</h1>
+            </div>
+        </div>
+        
+        <div class="dept-info">
+            <div class="dept-avatar" id="dept-avatar">D</div>
+            <div class="dept-details">
+                <h3 id="dept-full-name">Department Name</h3>
+                <p>Department Staff</p>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="department-dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="assigned-petitions.html" class="menu-item active">
+                <i class="fas fa-list"></i>
+                <span>Assigned Petitions</span>
+            </a>
+            <a href="department-analytics.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Department Analytics</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="department-settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" class="menu-item" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="page-title">
+                <h2><i class="fas fa-list-check"></i> Assigned Petitions</h2>
+                <p>Manage and track all petitions assigned to your department</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Stats Summary -->
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-count">0</h3>
+                        <p>Total Assigned</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pending-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pending-count">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon progress-icon">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="progress-count">0</h3>
+                        <p>In Progress</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon resolved-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="resolved-count">0</h3>
+                        <p>Resolved</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3 style="margin-bottom: 1rem;"><i class="fas fa-filter"></i> Advanced Filters</h3>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="status-filter">Status</label>
+                        <select id="status-filter">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="urgency-filter">Urgency Level</label>
+                        <select id="urgency-filter">
+                            <option value="">All Levels</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="category-filter">Category</label>
+                        <select id="category-filter">
+                            <option value="">All Categories</option>
+                            <option value="infrastructure">Infrastructure</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="safety">Safety</option>
+                            <option value="service">Service</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="search-input">Search</label>
+                        <input type="text" id="search-input" placeholder="Search by ticket ID or title...">
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-outline" id="clear-filters-btn">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </button>
+                    <button class="btn btn-primary" id="apply-filters-btn">
+                        <i class="fas fa-search"></i> Apply Filters
+                    </button>
+                    <button class="btn btn-success" id="export-btn">
+                        <i class="fas fa-download"></i> Export to CSV
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="action-buttons">
+                    <div class="action-btn" id="mark-reviewed-btn">
+                        <i class="fas fa-check-double"></i>
+                        <span>Mark All as Reviewed</span>
+                    </div>
+                    <div class="action-btn" id="bulk-update-btn">
+                        <i class="fas fa-edit"></i>
+                        <span>Bulk Status Update</span>
+                    </div>
+                    <div class="action-btn" id="priority-sort-btn">
+                        <i class="fas fa-sort-amount-down"></i>
+                        <span>Sort by Priority</span>
+                    </div>
+                    <div class="action-btn" id="overdue-filter-btn">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Show Overdue Only</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Petitions Section -->
+            <div class="petitions-section">
+                <div class="section-header">
+                    <h3><span id="petition-count">0</span> Petitions</h3>
+                    <button class="btn btn-outline" id="refresh-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                
+                <div class="petitions-grid" id="petitions-grid">
+                    <!-- Petitions will be loaded here -->
+                </div>
+                
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No Petitions Found</h3>
+                    <p>No petitions match your current filters.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="loading-text">Loading Petitions</div>
+            <div class="loading-subtext">Fetching your assigned petitions...</div>
+        </div>
+    </div>
+    
+    <!-- Petition Details Modal -->
+    <div id="petition-modal" class="petition-modal">
+        <div class="petition-modal-content">
+            <div class="petition-modal-header">
+                <h2><i class="fas fa-file-alt"></i> Petition Details</h2>
+                <button class="modal-close-btn" onclick="closeModal()" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="petition-modal-body" id="petition-modal-body">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Update Confirmation Modal -->
+    <div id="status-modal" class="status-modal">
+        <div class="status-modal-content">
+            <div class="status-modal-header">
+                <div class="status-icon-wrapper">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h2>Update Petition Status</h2>
+            </div>
+            <div class="status-modal-body" id="status-modal-body">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+            <div class="status-modal-footer">
+                <button class="btn-cancel" onclick="cancelStatusUpdate()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn-confirm" onclick="confirmStatusUpdate()">
+                    <i class="fas fa-check"></i> Confirm Update
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" id="toast-icon"></i>
+        <span id="toast-message">Success</span>
+    </div>
+    
+    <script>
+        // Placeholder - This would connect to the actual backend
+        const petitions = [];
+        
+        // Load petitions when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPetitions();
+            
+            // Apply filters
+            document.getElementById('apply-filters-btn').addEventListener('click', applyFilters);
+            document.getElementById('clear-filters-btn').addEventListener('click', clearFilters);
+            
+            // Quick actions
+            document.getElementById('priority-sort-btn').addEventListener('click', sortByPriority);
+            document.getElementById('overdue-filter-btn').addEventListener('click', filterOverdue);
+            
+            // Export
+            document.getElementById('export-btn').addEventListener('click', exportToCSV);
+            
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                window.location.href = '/logout';
+            });
+        });
+        
+        let allPetitions = [];
+        
+        function loadPetitions() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex';
+            
+            // Get filter parameters
+            const status = document.getElementById('status-filter').value;
+            const urgency = document.getElementById('urgency-filter').value;
+            const category = document.getElementById('category-filter').value;
+            const search = document.getElementById('search-input').value;
+            
+            // Build query string
+            const params = new URLSearchParams();
+            if (status) params.append('status', status);
+            if (urgency) params.append('urgency', urgency);
+            if (category) params.append('category', category);
+            if (search) params.append('search', search);
+            
+            fetch(`/api/department/assigned-petitions?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    overlay.style.display = 'none';
+                    if (data.error) {
+                        showToast(data.error, 'error');
+                        return;
+                    }
+                    allPetitions = data.petitions || [];
+                    displayPetitions(allPetitions);
+                })
+                .catch(error => {
+                    overlay.style.display = 'none';
+                    console.error('Error loading petitions:', error);
+                    showToast('Failed to load petitions', 'error');
+                });
+        }
+        
+        function displayPetitions(petitions) {
+            const grid = document.getElementById('petitions-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            // Update counts
+            const totalCount = petitions.length;
+            const pendingCount = petitions.filter(p => p.status === 'pending').length;
+            const progressCount = petitions.filter(p => p.status === 'in_progress').length;
+            const resolvedCount = petitions.filter(p => p.status === 'resolved').length;
+            
+            // Update header count
+            document.getElementById('petition-count').textContent = totalCount;
+            
+            // Update stat cards
+            document.getElementById('total-count').textContent = totalCount;
+            document.getElementById('pending-count').textContent = pendingCount;
+            document.getElementById('progress-count').textContent = progressCount;
+            document.getElementById('resolved-count').textContent = resolvedCount;
+            
+            if (petitions.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            grid.innerHTML = petitions.map(petition => `
+                <div class="petition-card" id="card-${petition.ticket_id}">
+                    <input type="checkbox" class="petition-checkbox" 
+                           id="check-${petition.ticket_id}" 
+                           data-ticket-id="${petition.ticket_id}"
+                           data-title="${petition.title}"
+                           onchange="handleCheckboxChange(this)"
+                           onclick="event.stopPropagation()">
+                    <div class="card-header">
+                        <span class="ticket-id">#${petition.ticket_id}</span>
+                        <span class="badge urgency-${petition.urgency}">${petition.urgency}</span>
+                    </div>
+                    <h3 class="petition-title">${petition.title}</h3>
+                    <p class="petition-description">${petition.description.substring(0, 100)}...</p>
+                    <div class="petition-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span>${petition.category || 'General'}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>${new Date(petition.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-user"></i>
+                            <span>${petition.name}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="badge status-${petition.status}">${petition.status}</span>
+                        <div class="card-actions">
+                            <button class="btn-icon" onclick="viewPetition('${petition.ticket_id}')" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-icon" onclick="updateStatus('${petition.ticket_id}')" title="Update Status">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Store current petition data for modal operations
+        let currentPetition = null;
+        
+        function viewPetition(ticketId) {
+            const petition = allPetitions.find(p => p.ticket_id === ticketId);
+            if (!petition) {
+                showToast('Petition not found', 'error');
+                return;
+            }
+            
+            const modalBody = document.getElementById('petition-modal-body');
+            modalBody.innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-ticket-alt"></i> Ticket ID</div>
+                    <div class="detail-value">${petition.ticket_id}</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-user"></i> Student Name</div>
+                    <div class="detail-value">${petition.student_name}</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-envelope"></i> Email</div>
+                    <div class="detail-value">${petition.email}</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-phone"></i> Phone</div>
+                    <div class="detail-value">${petition.phone}</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-info-circle"></i> Status</div>
+                    <div class="detail-value">
+                        <span class="status-badge ${petition.status}">${petition.status.replace('_', ' ').toUpperCase()}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-exclamation-triangle"></i> Urgency</div>
+                    <div class="detail-value">
+                        <span class="urgency-badge ${petition.urgency}">${petition.urgency.toUpperCase()}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-calendar-alt"></i> Submitted On</div>
+                    <div class="detail-value">${new Date(petition.created_at).toLocaleString()}</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label"><i class="fas fa-file-alt"></i> Description</div>
+                    <div class="detail-value">${petition.description}</div>
+                </div>
+            `;
+            
+            document.getElementById('petition-modal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('petition-modal').classList.remove('show');
+        }
+        
+        function showStatusUpdateModal(ticketId) {
+            const petition = allPetitions.find(p => p.ticket_id === ticketId);
+            if (!petition) {
+                showToast('Petition not found', 'error');
+                return;
+            }
+            
+            currentPetition = petition;
+            
+            const modalBody = document.getElementById('status-modal-body');
+            modalBody.innerHTML = `
+                <div class="status-detail-card">
+                    <div class="status-detail-item">
+                        <span class="status-detail-label">
+                            <i class="fas fa-ticket-alt"></i> Ticket ID
+                        </span>
+                        <span class="status-detail-value">${petition.ticket_id}</span>
+                    </div>
+                    <div class="status-detail-item">
+                        <span class="status-detail-label">
+                            <i class="fas fa-user"></i> Student
+                        </span>
+                        <span class="status-detail-value">${petition.student_name}</span>
+                    </div>
+                    <div class="status-detail-item">
+                        <span class="status-detail-label">
+                            <i class="fas fa-info-circle"></i> Current Status
+                        </span>
+                        <span class="status-detail-value">
+                            <span class="status-badge ${petition.status}">${petition.status.replace('_', ' ').toUpperCase()}</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="status-select-wrapper">
+                    <label for="new-status-select">
+                        <i class="fas fa-sync-alt"></i> Select New Status
+                    </label>
+                    <select id="new-status-select" class="form-control" onchange="toggleRejectionReason()">
+                        <option value="pending" ${petition.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="in_progress" ${petition.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                        <option value="resolved" ${petition.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+                        <option value="rejected" ${petition.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                    </select>
+                </div>
+                
+                <div id="rejection-reason-wrapper" class="rejection-reason-wrapper" style="display: none;">
+                    <label for="rejection-reason-input">
+                        <i class="fas fa-comment-dots"></i> Rejection Reason <span style="color: red;">*</span>
+                    </label>
+                    <textarea id="rejection-reason-input" class="form-control" rows="4" placeholder="Please provide a detailed reason for rejecting this petition..."></textarea>
+                    <small style="color: #6c757d; margin-top: 5px; display: block;">This will be sent to the student via email and displayed in their dashboard.</small>
+                </div>
+            `;
+            
+            document.getElementById('status-modal').classList.add('show');
+            
+            // Check if rejected is already selected
+            toggleRejectionReason();
+        }
+        
+        function toggleRejectionReason() {
+            const statusSelect = document.getElementById('new-status-select');
+            const rejectionWrapper = document.getElementById('rejection-reason-wrapper');
+            
+            if (statusSelect && rejectionWrapper) {
+                if (statusSelect.value === 'rejected') {
+                    rejectionWrapper.style.display = 'block';
+                } else {
+                    rejectionWrapper.style.display = 'none';
+                }
+            }
+        }
+        
+        function confirmStatusUpdate() {
+            const newStatus = document.getElementById('new-status-select').value;
+            const rejectionReason = document.getElementById('rejection-reason-input').value.trim();
+            
+            if (!currentPetition) {
+                showToast('No petition selected', 'error');
+                return;
+            }
+            
+            // Validate rejection reason if status is rejected
+            if (newStatus === 'rejected' && !rejectionReason) {
+                showToast('Please provide a rejection reason', 'error');
+                return;
+            }
+            
+            const requestBody = {
+                status: newStatus
+            };
+            
+            // Add rejection reason if status is rejected
+            if (newStatus === 'rejected') {
+                requestBody.rejection_reason = rejectionReason;
+            }
+            
+            fetch(`/api/petitions/${currentPetition.ticket_id}/status`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error, 'error');
+                } else {
+                    showToast('Status updated successfully!', 'success');
+                    cancelStatusUpdate();
+                    loadPetitions();
+                }
+            })
+            .catch(error => {
+                console.error('Error updating status:', error);
+                showToast('Failed to update status', 'error');
+            });
+        }
+        
+        function cancelStatusUpdate() {
+            document.getElementById('status-modal').classList.remove('show');
+            currentPetition = null;
+        }
+        
+        function updateStatus(ticketId) {
+            showStatusUpdateModal(ticketId);
+        }
+        
+        function applyFilters() {
+            loadPetitions();
+        }
+        
+        function clearFilters() {
+            document.getElementById('status-filter').value = '';
+            document.getElementById('urgency-filter').value = '';
+            document.getElementById('category-filter').value = '';
+            document.getElementById('search-input').value = '';
+            loadPetitions();
+        }
+        
+        function sortByPriority() {
+            const sorted = [...allPetitions].sort((a, b) => {
+                const urgencyOrder = {'high': 3, 'medium': 2, 'low': 1};
+                return urgencyOrder[b.urgency] - urgencyOrder[a.urgency];
+            });
+            displayPetitions(sorted);
+            showToast('Sorted by priority', 'success');
+        }
+        
+        function filterOverdue() {
+            const now = new Date();
+            const overdue = allPetitions.filter(p => {
+                const created = new Date(p.created_at);
+                const daysDiff = (now - created) / (1000 * 60 * 60 * 24);
+                return p.status !== 'resolved' && daysDiff > 5;
+            });
+            displayPetitions(overdue);
+            showToast(`Showing ${overdue.length} overdue petitions`, 'success');
+        }
+        
+        function exportToCSV() {
+            if (allPetitions.length === 0) {
+                showToast('No petitions to export', 'error');
+                return;
+            }
+            
+            const headers = ['Ticket ID', 'Title', 'Category', 'Status', 'Urgency', 'Created Date'];
+            const rows = allPetitions.map(p => [
+                p.ticket_id,
+                p.title,
+                p.category || 'General',
+                p.status,
+                p.urgency,
+                new Date(p.created_at).toLocaleDateString()
+            ]);
+            
+            let csv = headers.join(',') + '\\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${cell}"`).join(',') + '\\n';
+            });
+            
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `petitions_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            showToast('Exported to CSV successfully', 'success');
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            
+            if (type === 'success') {
+                toastIcon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                toastIcon.className = 'fas fa-exclamation-circle';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Bulk Selection Functions
+        let selectedPetitions = new Set();
+        
+        function handleCheckboxChange(checkbox) {
+            const ticketId = checkbox.dataset.ticketId;
+            const card = document.getElementById(`card-${ticketId}`);
+            
+            if (checkbox.checked) {
+                selectedPetitions.add(ticketId);
+                card.classList.add('selected');
+            } else {
+                selectedPetitions.delete(ticketId);
+                card.classList.remove('selected');
+            }
+            
+            updateSelectionBar();
+        }
+        
+        function updateSelectionBar() {
+            const selectionBar = document.getElementById('bulk-selection-bar');
+            const selectionCount = document.getElementById('selection-count');
+            
+            selectionCount.textContent = selectedPetitions.size;
+            
+            if (selectedPetitions.size > 0) {
+                selectionBar.classList.add('active');
+            } else {
+                selectionBar.classList.remove('active');
+            }
+        }
+        
+        function clearAllSelections() {
+            selectedPetitions.clear();
+            
+            // Uncheck all checkboxes
+            document.querySelectorAll('.petition-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Remove selected class from all cards
+            document.querySelectorAll('.petition-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            updateSelectionBar();
+        }
+        
+        function openBulkUpdateModal() {
+            if (selectedPetitions.size === 0) {
+                showToast('Please select at least one petition', 'error');
+                return;
+            }
+            
+            const modal = document.getElementById('bulk-modal');
+            const selectedList = document.getElementById('selected-petitions-list');
+            const bulkCount = document.getElementById('bulk-count');
+            
+            bulkCount.textContent = selectedPetitions.size;
+            
+            // Build list of selected petitions
+            let listHTML = '';
+            selectedPetitions.forEach(ticketId => {
+                const checkbox = document.getElementById(`check-${ticketId}`);
+                const title = checkbox.dataset.title;
+                listHTML += `
+                    <div class="selected-petition-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        <strong>#${ticketId}</strong>
+                        <span style="flex: 1;">${title}</span>
+                    </div>
+                `;
+            });
+            
+            selectedList.innerHTML = listHTML;
+            modal.classList.add('show');
+        }
+        
+        function closeBulkModal() {
+            const modal = document.getElementById('bulk-modal');
+            modal.classList.remove('show');
+            
+            // Reset form
+            document.getElementById('bulk-status').value = '';
+            document.getElementById('bulk-rejection-text').value = '';
+            document.getElementById('bulk-rejection-reason').classList.remove('show');
+        }
+        
+        function toggleBulkRejectionReason() {
+            const status = document.getElementById('bulk-status').value;
+            const rejectionDiv = document.getElementById('bulk-rejection-reason');
+            
+            if (status === 'rejected') {
+                rejectionDiv.classList.add('show');
+            } else {
+                rejectionDiv.classList.remove('show');
+            }
+        }
+        
+        async function confirmBulkUpdate() {
+            const status = document.getElementById('bulk-status').value;
+            const rejectionReason = document.getElementById('bulk-rejection-text').value;
+            
+            if (!status) {
+                showToast('Please select a status', 'error');
+                return;
+            }
+            
+            if (status === 'rejected' && !rejectionReason.trim()) {
+                showToast('Please provide a rejection reason', 'error');
+                return;
+            }
+            
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex';
+            
+            let successCount = 0;
+            let failCount = 0;
+            
+            // Update each petition
+            for (const ticketId of selectedPetitions) {
+                try {
+                    const updateData = { status };
+                    if (status === 'rejected') {
+                        updateData.rejection_reason = rejectionReason;
+                    }
+                    
+                    const response = await fetch(`/api/petitions/${ticketId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                    }
+                } catch (error) {
+                    console.error(`Error updating ${ticketId}:`, error);
+                    failCount++;
+                }
+            }
+            
+            overlay.style.display = 'none';
+            closeBulkModal();
+            
+            // Show result
+            if (failCount === 0) {
+                showToast(`Successfully updated ${successCount} petition(s)`, 'success');
+            } else {
+                showToast(`Updated ${successCount}, failed ${failCount} petition(s)`, 'error');
+            }
+            
+            // Clear selections and reload
+            clearAllSelections();
+            loadPetitions();
+        }
+        
+        // Quick action: Bulk Update button
+        document.getElementById('bulk-update-btn').addEventListener('click', function() {
+            if (selectedPetitions.size > 0) {
+                openBulkUpdateModal();
+            } else {
+                showToast('Please select petitions using the checkboxes', 'error');
+            }
+        });
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const petitionModal = document.getElementById('petition-modal');
+            const statusModal = document.getElementById('status-modal');
+            const bulkModal = document.getElementById('bulk-modal');
+            
+            if (event.target === petitionModal) {
+                closeModal();
+            }
+            if (event.target === statusModal) {
+                cancelStatusUpdate();
+            }
+            if (event.target === bulkModal) {
+                closeBulkModal();
+            }
+        }
+    </script>
+    
+    <!-- Bulk Selection Bar -->
+    <div class="bulk-selection-bar" id="bulk-selection-bar">
+        <div class="selection-info">
+            <i class="fas fa-check-circle"></i>
+            <span><span class="selection-count" id="selection-count">0</span> Selected</span>
+        </div>
+        <div class="bulk-action-buttons">
+            <button class="bulk-btn" onclick="openBulkUpdateModal()">
+                <i class="fas fa-edit"></i>
+                Update Status
+            </button>
+            <button class="bulk-btn cancel" onclick="clearAllSelections()">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </div>
+    </div>
+    
+    <!-- Bulk Update Modal -->
+    <div class="bulk-modal" id="bulk-modal">
+        <div class="bulk-modal-content">
+            <div class="bulk-modal-header">
+                <h3><i class="fas fa-edit"></i> Bulk Status Update</h3>
+                <button class="close-bulk-modal" onclick="closeBulkModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="bulk-modal-body">
+                <div class="selected-petitions-list" id="selected-petitions-list">
+                    <!-- Selected petitions will be listed here -->
+                </div>
+                
+                <div class="bulk-status-select">
+                    <label for="bulk-status">Select New Status</label>
+                    <select id="bulk-status" onchange="toggleBulkRejectionReason()">
+                        <option value="">-- Select Status --</option>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                
+                <div class="bulk-rejection-reason" id="bulk-rejection-reason">
+                    <label for="bulk-rejection-text">
+                        <i class="fas fa-exclamation-circle"></i> Rejection Reason (Required)
+                    </label>
+                    <textarea 
+                        id="bulk-rejection-text" 
+                        placeholder="Please provide a reason for rejecting these petitions..."
+                        rows="4"
+                    ></textarea>
+                    <small style="color: var(--gray); display: block; margin-top: 0.5rem;">
+                        This reason will be sent to all petition submitters via email.
+                    </small>
+                </div>
+            </div>
+            <div class="bulk-modal-footer">
+                <button class="btn btn-outline" onclick="closeBulkModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmBulkUpdate()">
+                    <i class="fas fa-check"></i> Update All (<span id="bulk-count">0</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

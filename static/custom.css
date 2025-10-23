@@ -1,0 +1,22 @@
+/* Custom styles moved from inline HTML */
+.logout-btn {
+    color: white;
+    border-color: rgba(255,255,255,0.5);
+}
+.empty-state-hidden, .alert-hidden {
+    display: none;
+}
+.full-width-btn {
+    width: 100%;
+}
+.submit-petition-btn {
+    margin-top: 1rem;
+}
+.subtitle {
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 1rem;
+}
+.social-links {
+    display: flex;
+    gap: 1rem;
+}

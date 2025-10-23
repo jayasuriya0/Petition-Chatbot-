@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Petition | Petition Management System</title>
+    <link rel="stylesheet" href="/static/custom.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .page-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Petition Form */
+        .petition-form-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        /* Character Counter Styles */
+        .char-counter {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .char-counter.valid {
+            color: var(--success);
+        }
+        
+        .char-counter.invalid {
+            color: var(--danger);
+        }
+        
+        .char-hint {
+            display: block;
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(247, 37, 133, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid var(--danger);
+        }
+        
+        .char-hint i {
+            margin-right: 5px;
+        }
+        
+        textarea.form-control.invalid-length {
+            border-color: var(--danger);
+        }
+        
+        textarea.form-control.valid-length {
+            border-color: var(--success);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .urgency-indicator {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--gray);
+        }
+        
+        .urgency-indicator i {
+            font-size: 1.2rem;
+        }
+        
+        #auto-urgency-display {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.1rem;
+            animation: fadeIn 0.5s;
+            border: 2px solid;
+        }
+        
+        #auto-urgency-display.urgency-low {
+            background-color: rgba(76, 201, 240, 0.15);
+            border-color: var(--success);
+            color: var(--success);
+        }
+        
+        #auto-urgency-display.urgency-medium {
+            background-color: rgba(248, 150, 30, 0.15);
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+        
+        #auto-urgency-display.urgency-high {
+            background-color: rgba(247, 37, 133, 0.15);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        
+        #auto-urgency-display i {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+        
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-upload p {
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-upload small {
+            color: var(--gray);
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .attachments-preview {
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .attachment-item i {
+            color: var(--primary);
+        }
+        
+        .attachment-name {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+        
+        .remove-attachment {
+            color: var(--danger);
+            cursor: pointer;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: white;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--gray);
+        }
+        
+        /* AI Assistant Styles */
+        .ai-assistant {
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .ai-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .ai-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .ai-tips {
+            background-color: white;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .ai-tips ul {
+            padding-left: 1.5rem;
+        }
+        
+        .ai-tips li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .ai-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .ai-btn {
+            background-color: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .ai-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #e9ecef;
+        }
+        
+        .ai-btn.loading {
+            pointer-events: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+        }
+        
+        .ai-btn .btn-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-btn .loading-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .ai-btn.loading .loading-spinner {
+            display: inline-block;
+        }
+        
+        .ai-btn.loading .btn-icon {
+            display: none;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .ai-suggestion {
+            background-color: white;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+            border: 1px solid var(--border);
+        }
+        
+        .ai-suggestion h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .ai-suggestion p {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .ai-suggestion textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .ai-suggestion-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .ai-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-file-signature"></i>
+                    <h1>Petition Management System</h1>
+                </div>
+                <nav>
+                <ul>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="submit-petition.html" class="active">Submit Petition</a></li>
+                        <li><a href="track-petition.html">Track Petition</a></li>
+                        <li><a href="profile.html">Profile</a></li>
+                    </ul>
+                </nav>
+                <div class="user-actions">
+                    <div class="user-profile">
+                        <div class="avatar" id="user-avatar">U</div>
+                        <span id="user-name">Loading...</span>
+                    </div>
+                    <a href="/logout" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.5);">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h2>Submit a Petition</h2>
+                <p>Raise your concerns and submit petitions to relevant departments for resolution. Please provide accurate information to help us address your issue effectively.</p>
+            </div>
+
+            <div class="petition-form-container">
+                <!-- AI Assistant -->
+                <div class="ai-assistant">
+                    <div class="ai-header">
+                        <div class="ai-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>AI Petition Assistant</h3>
+                    </div>
+                    <div class="ai-tips">
+                        <p><strong>Tips for an effective petition:</strong></p>
+                        <ul>
+                            <li>Be specific about the issue and location</li>
+                            <li>Clearly state what change you want to see</li>
+                            <li>Include relevant facts and evidence</li>
+                            <li>Keep the tone respectful and constructive</li>
+                            <li>Provide contact information for follow-up</li>
+                        </ul>
+                    </div>
+                    <div class="ai-actions">
+                        <button class="ai-btn" id="improve-petition">
+                            <span class="loading-spinner"></span>
+                            <span class="btn-text">
+                                <i class="fas fa-magic btn-icon"></i> Improve My Petition
+                            </span>
+                        </button>
+                        <button class="ai-btn" id="suggest-title">
+                            <span class="loading-spinner"></span>
+                            <span class="btn-text">
+                                <i class="fas fa-heading btn-icon"></i> Suggest Title
+                            </span>
+                        </button>
+                        <button class="ai-btn" id="check-clarity">
+                            <span class="loading-spinner"></span>
+                            <span class="btn-text">
+                                <i class="fas fa-check-circle btn-icon"></i> Check Clarity
+                            </span>
+                        </button>
+                        <button class="ai-btn" id="add-details">
+                            <span class="loading-spinner"></span>
+                            <span class="btn-text">
+                                <i class="fas fa-plus-circle btn-icon"></i> Add Details
+                            </span>
+                        </button>
+                    </div>
+                    <div class="ai-suggestion" id="ai-suggestion">
+                        <h4>AI Suggestion</h4>
+                        <p id="suggestion-text">Our AI has generated a suggestion to improve your petition:</p>
+                        <textarea id="ai-suggestion-text"></textarea>
+                        <div class="ai-suggestion-actions">
+                            <button class="btn btn-outline" id="discard-suggestion">Discard</button>
+                            <button class="btn btn-primary" id="apply-suggestion">Apply Suggestion</button>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="petition-form">
+                    <div class="form-group">
+                        <label for="petition-title">Petition Title *</label>
+                        <input type="text" id="petition-title" class="form-control" placeholder="Enter a clear and concise title for your petition" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Category *</label>
+                            <select id="category" class="form-control" required>
+                                <option value="">Select a category</option>
+                                <option value="infrastructure">Infrastructure</option>
+                                <option value="sanitation">Sanitation</option>
+                                <option value="education">Education</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="public-safety">Public Safety</option>
+                                <option value="environment">Environment</option>
+                                <option value="transportation">Transportation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="department">Department *</label>
+                            <select id="department" class="form-control" required>
+                                <option value="">Select department</option>
+                                <!-- Departments will be loaded dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" class="form-control" placeholder="Provide detailed information about your petition. Include location, specific issues, and any relevant details." required minlength="50"></textarea>
+                        <div class="char-counter" id="char-counter">
+                            <span id="char-count">0</span> / 50 characters (minimum)
+                        </div>
+                        <small class="char-hint" id="char-hint" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i> Description must be at least 50 characters
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location *</label>
+                        <input type="text" id="location" class="form-control" placeholder="Enter the location or address related to your petition" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="full-name">Full Name *</label>
+                            <input type="text" id="full-name" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter your email address" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" id="address" class="form-control" placeholder="Enter your full address">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Urgency Level (Auto-Detected)</label>
+                        <div class="urgency-indicator" id="urgency-indicator">
+                            <i class="fas fa-robot"></i>
+                            <span id="urgency-text">AI will automatically analyze your description to determine urgency level</span>
+                        </div>
+                        <div id="auto-urgency-display">
+                            <i class="fas fa-thermometer-half" id="urgency-icon"></i>
+                            <span id="urgency-level-text">Medium</span>
+                        </div>
+                        <input type="hidden" id="urgency" value="medium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Attachments (Optional)</label>
+                        <div class="file-upload" id="file-upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload files or drag and drop</p>
+                            <small>Supported formats: JPG, PNG, PDF, DOC (Max: 5MB each)</small>
+                            <input type="file" id="file-input" multiple>
+                        </div>
+                        <div class="attachments-preview" id="attachments-preview">
+                            <!-- Attachments will be listed here -->
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Petition</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Petition Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check if user is logged in
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        // Load user profile for header
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/current-user', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('user-name').textContent = data.name;
+                    document.getElementById('user-avatar').textContent = 
+                        data.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+
+        // Get current user ID
+        async function getCurrentUserId() {
+            try {
+                const response = await fetch('/api/profile/current_user_id', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                return data.user_id;
+            } catch (error) {
+                console.error('Error getting user ID:', error);
+                return null;
+            }
+        }
+
+        // Auto-detect urgency level based on description
+        function detectUrgencyLevel(description, title = '') {
+            const text = (description + ' ' + title).toLowerCase();
+            
+            // High urgency keywords
+            const highUrgencyKeywords = [
+                'urgent', 'emergency', 'immediate', 'critical', 'danger', 'serious', 
+                'threat', 'risk', 'severe', 'fatal', 'dying', 'dead', 'death',
+                'injury', 'accident', 'fire', 'flood', 'leak', 'broken', 'damage',
+                'safety', 'hazard', 'toxic', 'poison', 'blood', 'pain', 'collapse',
+                'explosion', 'violence', 'assault', 'theft', 'robbery', 'steal',
+                'quickly', 'asap', 'now', 'today', 'help'
+            ];
+            
+            // Medium urgency keywords
+            const mediumUrgencyKeywords = [
+                'problem', 'issue', 'concern', 'need', 'require', 'important',
+                'delay', 'waiting', 'pending', 'slow', 'malfunction', 'error',
+                'bug', 'fault', 'defect', 'repair', 'fix', 'maintenance',
+                'complaint', 'dissatisfied', 'unhappy', 'inconvenient'
+            ];
+            
+            // Count keyword matches
+            let highScore = 0;
+            let mediumScore = 0;
+            
+            highUrgencyKeywords.forEach(keyword => {
+                if (text.includes(keyword)) highScore++;
+            });
+            
+            mediumUrgencyKeywords.forEach(keyword => {
+                if (text.includes(keyword)) mediumScore++;
+            });
+            
+            // Check for exclamation marks and capital letters (indicators of urgency)
+            const exclamationCount = (description.match(/!/g) || []).length;
+            const capsRatio = (description.match(/[A-Z]/g) || []).length / description.length;
+            
+            if (exclamationCount > 2 || capsRatio > 0.3) {
+                highScore += 2;
+            }
+            
+            // Determine urgency level
+            if (highScore >= 2) {
+                return 'high';
+            } else if (highScore >= 1 || mediumScore >= 3) {
+                return 'medium';
+            } else {
+                return 'low';
+            }
+        }
+        
+        function updateUrgencyDisplay(level) {
+            const display = document.getElementById('auto-urgency-display');
+            const icon = document.getElementById('urgency-icon');
+            const text = document.getElementById('urgency-level-text');
+            const hiddenInput = document.getElementById('urgency');
+            
+            // Remove all urgency classes
+            display.classList.remove('urgency-low', 'urgency-medium', 'urgency-high');
+            
+            // Update based on level
+            if (level === 'high') {
+                display.classList.add('urgency-high');
+                icon.className = 'fas fa-thermometer-full';
+                text.textContent = 'High Urgency';
+            } else if (level === 'medium') {
+                display.classList.add('urgency-medium');
+                icon.className = 'fas fa-thermometer-half';
+                text.textContent = 'Medium Urgency';
+            } else {
+                display.classList.add('urgency-low');
+                icon.className = 'fas fa-thermometer-empty';
+                text.textContent = 'Low Urgency';
+            }
+            
+            // Update hidden input
+            hiddenInput.value = level;
+            
+            // Show the display
+            display.style.display = 'block';
+        }
+
+
+        // File upload handling
+        const fileInput = document.getElementById('file-input');
+        const fileUploadArea = document.getElementById('file-upload-area');
+        const attachmentsPreview = document.getElementById('attachments-preview');
+
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--primary)';
+            fileUploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.borderColor = 'var(--border)';
+            fileUploadArea.style.backgroundColor = 'transparent';
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--border)';
+            fileUploadArea.style.backgroundColor = 'transparent';
+            if (e.dataTransfer.files.length > 0) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                handleFiles(fileInput.files);
+            }
+        });
+
+        function handleFiles(files) {
+            attachmentsPreview.style.display = 'block';
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+                    continue;
+                }
+                
+                const validTypes = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword'];
+                if (!validTypes.includes(file.type)) {
+                    alert(`File "${file.name}" is not a supported format.`);
+                    continue;
+                }
+                
+                const attachmentItem = document.createElement('div');
+                attachmentItem.className = 'attachment-item';
+                
+                let iconClass = 'fas fa-file';
+                if (file.type.includes('image')) iconClass = 'fas fa-file-image';
+                else if (file.type.includes('pdf')) iconClass = 'fas fa-file-pdf';
+                else if (file.type.includes('word')) iconClass = 'fas fa-file-word';
+                
+                attachmentItem.innerHTML = `
+                    <i class="${iconClass}"></i>
+                    <div class="attachment-name">${file.name}</div>
+                    <div class="remove-attachment"><i class="fas fa-times"></i></div>
+                `;
+                
+                attachmentsPreview.appendChild(attachmentItem);
+                
+                attachmentItem.querySelector('.remove-attachment').addEventListener('click', function() {
+                    attachmentItem.remove();
+                    if (attachmentsPreview.children.length === 0) {
+                        attachmentsPreview.style.display = 'none';
+                    }
+                });
+            }
+            fileInput.value = '';
+        }
+
+        // AI Assistant functionality
+        const aiSuggestion = document.getElementById('ai-suggestion');
+        const aiSuggestionText = document.getElementById('ai-suggestion-text');
+        const suggestionText = document.getElementById('suggestion-text');
+        const descriptionTextarea = document.getElementById('description');
+        const titleInput = document.getElementById('petition-title');
+        const categorySelect = document.getElementById('category');
+        const locationInput = document.getElementById('location');
+        
+        // Character counter for description
+        const charCountSpan = document.getElementById('char-count');
+        const charCounterDiv = document.getElementById('char-counter');
+        const charHint = document.getElementById('char-hint');
+        const minCharacters = 50;
+        
+        function updateCharacterCount() {
+            const currentLength = descriptionTextarea.value.length;
+            charCountSpan.textContent = currentLength;
+            
+            if (currentLength >= minCharacters) {
+                charCounterDiv.classList.remove('invalid');
+                charCounterDiv.classList.add('valid');
+                descriptionTextarea.classList.remove('invalid-length');
+                descriptionTextarea.classList.add('valid-length');
+                charHint.style.display = 'none';
+            } else {
+                charCounterDiv.classList.remove('valid');
+                charCounterDiv.classList.add('invalid');
+                descriptionTextarea.classList.remove('valid-length');
+                descriptionTextarea.classList.add('invalid-length');
+                
+                // Only show hint if user has started typing
+                if (currentLength > 0) {
+                    charHint.style.display = 'block';
+                } else {
+                    charHint.style.display = 'none';
+                }
+            }
+        }
+        
+        // Update character count on input
+        descriptionTextarea.addEventListener('input', updateCharacterCount);
+        
+        // Initialize on page load
+        updateCharacterCount();
+
+        // Helper function to manage button loading state
+        function setButtonLoading(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        // Improve Petition button
+        document.getElementById('improve-petition').addEventListener('click', async function() {
+            const currentText = descriptionTextarea.value;
+            if (!currentText.trim()) {
+                alert('Please write something in the description first.');
+                return;
+            }
+            
+            // Show loading state
+            setButtonLoading('improve-petition', true);
+            
+            suggestionText.textContent = "Our AI is analyzing your petition...";
+            aiSuggestionText.value = "Analyzing your petition content...";
+            aiSuggestion.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/ai/improve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: currentText,
+                        title: titleInput.value,
+                        category: categorySelect.value
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    aiSuggestionText.value = data.improved_text;
+                    suggestionText.textContent = "Our AI has improved your petition text:";
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                aiSuggestionText.value = `Error: ${error.message}`;
+            } finally {
+                // Remove loading state
+                setButtonLoading('improve-petition', false);
+            }
+        });
+        
+        // Suggest Title button
+        document.getElementById('suggest-title').addEventListener('click', async function() {
+            const currentDescription = descriptionTextarea.value;
+            if (!currentDescription.trim()) {
+                alert('Please write something in the description first.');
+                return;
+            }
+            
+            // Show loading state
+            setButtonLoading('suggest-title', true);
+            
+            suggestionText.textContent = "Our AI is generating title suggestions...";
+            aiSuggestionText.value = "Generating title suggestions...";
+            aiSuggestion.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/ai/suggest-titles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        description: currentDescription,
+                        category: categorySelect.value
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    aiSuggestionText.value = data.suggested_titles;
+                    suggestionText.textContent = "Our AI has generated these title suggestions:";
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                aiSuggestionText.value = `Error: ${error.message}`;
+            } finally {
+                // Remove loading state
+                setButtonLoading('suggest-title', false);
+            }
+        });
+        
+        // Check Clarity button
+        document.getElementById('check-clarity').addEventListener('click', async function() {
+            const currentText = descriptionTextarea.value;
+            if (!currentText.trim()) {
+                alert('Please write something in the description first.');
+                return;
+            }
+            
+            // Show loading state
+            setButtonLoading('check-clarity', true);
+            
+            suggestionText.textContent = "Our AI is analyzing clarity...";
+            aiSuggestionText.value = "Analyzing clarity of your petition...";
+            aiSuggestion.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/ai/check-clarity', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: currentText
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    aiSuggestionText.value = data.clarity_analysis;
+                    suggestionText.textContent = "Our AI has analyzed your petition's clarity:";
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                aiSuggestionText.value = `Error: ${error.message}`;
+            } finally {
+                // Remove loading state
+                setButtonLoading('check-clarity', false);
+            }
+        });
+        
+        // Add Details button
+        document.getElementById('add-details').addEventListener('click', async function() {
+            const currentText = descriptionTextarea.value;
+            if (!currentText.trim()) {
+                alert('Please write something in the description first.');
+                return;
+            }
+            
+            // Show loading state
+            setButtonLoading('add-details', true);
+            
+            suggestionText.textContent = "Our AI is suggesting additional details...";
+            aiSuggestionText.value = "Generating suggestions for additional details...";
+            aiSuggestion.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/ai/add-details', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: currentText,
+                        category: categorySelect.value,
+                        location: locationInput.value
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    aiSuggestionText.value = data.detail_suggestions;
+                    suggestionText.textContent = "Our AI suggests adding these details:";
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                aiSuggestionText.value = `Error: ${error.message}`;
+            } finally {
+                // Remove loading state
+                setButtonLoading('add-details', false);
+            }
+        });
+        
+        // Apply Suggestion button
+        document.getElementById('apply-suggestion').addEventListener('click', function() {
+            const suggestion = aiSuggestionText.value;
+            if (suggestionText.textContent.includes("title")) {
+                const titles = suggestion.split('\n').filter(t => t.trim());
+                if (titles.length > 0) {
+                    titleInput.value = titles[0].replace(/^\d+\.\s*/, '');
+                }
+            } else {
+                descriptionTextarea.value = suggestion;
+                updateCharacterCount(); // Update counter after AI modifies description
+            }
+            aiSuggestion.style.display = 'none';
+        });
+        
+        // Discard Suggestion button
+        document.getElementById('discard-suggestion').addEventListener('click', function() {
+            aiSuggestion.style.display = 'none';
+        });
+
+        // Form submission
+        document.getElementById('petition-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validate description length
+            const description = document.getElementById('description').value;
+            if (description.length < minCharacters) {
+                alert(`Description must be at least ${minCharacters} characters. Currently: ${description.length} characters.`);
+                descriptionTextarea.focus();
+                descriptionTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            
+            const userId = await getCurrentUserId();
+            if (!userId) {
+                alert('Please login to submit a petition');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Get or auto-detect urgency level
+            let urgency = document.getElementById('urgency').value;
+            if (!urgency) {
+                // Auto-detect if not already set
+                const description = document.getElementById('description').value;
+                const title = document.getElementById('petition-title').value;
+                urgency = detectUrgencyLevel(description, title);
+                document.getElementById('urgency').value = urgency;
+            }
+            
+            const formData = {
+                user_id: userId,
+                title: document.getElementById('petition-title').value,
+                category: document.getElementById('category').value,
+                department: document.getElementById('department').value,
+                description: document.getElementById('description').value,
+                location: document.getElementById('location').value,
+                urgency: urgency,
+                full_name: document.getElementById('full-name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                attachments: [] // You can implement file upload separately
+            };
+            
+            try {
+                const response = await fetch('/api/petitions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    alert(`Petition submitted successfully! Your tracking ID: ${data.ticket_id}`);
+                    // Reset form
+                    this.reset();
+                    // Hide urgency display
+                    document.getElementById('auto-urgency-display').style.display = 'none';
+                    document.getElementById('urgency').value = 'medium';
+                    // Clear attachments
+                    const attachmentsPreview = document.getElementById('attachments-preview');
+                    attachmentsPreview.innerHTML = '';
+                    attachmentsPreview.style.display = 'none';
+                    // Hide AI suggestion
+                    document.getElementById('ai-suggestion').style.display = 'none';
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                alert(`Error submitting petition: ${error.message}`);
+            }
+        });
+
+        // Load departments
+        async function loadDepartments() {
+            try {
+                const response = await fetch('/api/departments');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const departmentSelect = document.getElementById('department');
+                    departmentSelect.innerHTML = '<option value="">Select department</option>';
+                    
+                    data.departments.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept.name;
+                        option.textContent = dept.name;
+                        departmentSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading departments:', error);
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!await checkAuth()) {
+                return;
+            }
+            await loadUserProfile();
+            await loadDepartments();
+            
+            // Set up urgency detection
+            let urgencyDetectionTimeout;
+            function scheduleUrgencyDetection() {
+                clearTimeout(urgencyDetectionTimeout);
+                urgencyDetectionTimeout = setTimeout(() => {
+                    const description = descriptionTextarea.value;
+                    const title = titleInput.value;
+                    
+                    if (description.trim().length > 20) {
+                        const urgencyLevel = detectUrgencyLevel(description, title);
+                        updateUrgencyDisplay(urgencyLevel);
+                    } else {
+                        document.getElementById('auto-urgency-display').style.display = 'none';
+                    }
+                }, 500); // Debounce for 500ms
+            }
+            
+            descriptionTextarea.addEventListener('input', scheduleUrgencyDetection);
+            titleInput.addEventListener('input', scheduleUrgencyDetection);
+        });
+    </script>
+</body>
+</html>
+```

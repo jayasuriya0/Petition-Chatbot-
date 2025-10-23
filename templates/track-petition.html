@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Petition | Petition Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/custom.css">
+    <style>
+        /* Reuse the same CSS variables and base styles from dashboard */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles (same as dashboard) */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: var(--gray);
+        }
+        
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Results Section */
+        .results-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-in-progress {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-resolved {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .rejection-reason-row {
+            flex-direction: column;
+            background: #fff3f3;
+            border-left: 4px solid #e74c3c;
+            padding: 15px !important;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        
+        .rejection-reason-row .detail-label {
+            color: #e74c3c;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .rejection-reason-box {
+            background: white;
+            border: 1px solid #e74c3c;
+            padding: 12px;
+            border-radius: 6px;
+            color: #333;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border);
+        }
+        
+        .petition-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: white;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--gray);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+            }
+            
+            .detail-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Custom Styles */
+        .logout-btn {
+            color: white;
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        .full-width-btn {
+            width: 100%;
+        }
+        
+        .empty-state-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-file-signature"></i>
+                    <h1>Petition Management System</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="submit-petition.html">Submit Petition</a></li>
+                        <li><a href="track-petition.html" class="active">Track Petition</a></li>
+                        <li><a href="profile.html">Profile</a></li>
+                    </ul>
+                </nav>
+                <div class="user-actions">
+                    <div class="user-profile">
+                        <div class="avatar" id="user-avatar">U</div>
+                        <span id="user-name">Loading...</span>
+                    </div>
+                    <a href="/logout" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.5);">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h2>Track Your Petitions</h2>
+                <p>Search and monitor the status of your submitted petitions.</p>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <form id="search-form" class="search-form">
+                    <div class="form-group">
+                        <label for="ticket-id">Ticket ID</label>
+                        <input type="text" id="ticket-id" class="form-control" placeholder="Enter ticket ID">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" class="form-control">
+                            <option value="">All Categories</option>
+                            <option value="infrastructure">Infrastructure</option>
+                            <option value="sanitation">Sanitation</option>
+                            <option value="education">Education</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="public-safety">Public Safety</option>
+                            <option value="environment">Environment</option>
+                            <option value="transportation">Transportation</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date-from">Date From</label>
+                        <input type="date" id="date-from" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date-to">Date To</label>
+                        <input type="date" id="date-to" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary full-width-btn">Submit</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="section-header">
+                    <h3>Search Results</h3>
+                    <span id="results-count">0 petitions found</span>
+                </div>
+                
+                <div id="results-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Department</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-tbody">
+                            <!-- Results will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div id="empty-state" class="empty-state empty-state-hidden">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Petitions Found</h3>
+                        <p>No petitions match your search criteria.</p>
+                    </div>
+                </div>
+                
+                <!-- Petition Details Modal -->
+                <div id="petition-details" class="petition-details">
+                    <h4>Petition Details</h4>
+                    <div id="details-content">
+                        <!-- Details will be loaded here -->
+                    </div>
+                    <button class="btn btn-outline" onclick="closeDetails()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Petition Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check if user is logged in
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        // Load user profile for header
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/current-user', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('user-name').textContent = data.name;
+                    document.getElementById('user-avatar').textContent = 
+                        data.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+
+        // Get current user ID
+        async function getCurrentUserId() {
+            try {
+                const response = await fetch('/api/profile/current_user_id', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                return data.user_id;
+            } catch (error) {
+                console.error('Error getting user ID:', error);
+                return null;
+            }
+        }
+        
+        // Search petitions
+        async function searchPetitions(searchData) {
+            try {
+                // Get current user ID from session
+                const userId = await getCurrentUserId();
+                
+                if (!userId && !searchData.ticket_id) {
+                    alert('Please log in to search all petitions or enter a Ticket ID');
+                    return;
+                }
+                
+                if (userId) {
+                    searchData.user_id = userId;
+                }
+                
+                console.log('Search data:', searchData);
+                
+                const response = await fetch('/api/petitions/search', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(searchData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResults(data.petitions);
+                } else {
+                    throw new Error('Failed to search petitions');
+                }
+            } catch (error) {
+                console.error('Error searching petitions:', error);
+                alert('Error searching petitions. Please try again.');
+            }
+        }
+        
+        // Display search results
+        function displayResults(petitions) {
+            const tbody = document.getElementById('results-tbody');
+            const emptyState = document.getElementById('empty-state');
+            const resultsCount = document.getElementById('results-count');
+            
+            resultsCount.textContent = `${petitions.length} petitions found`;
+            
+            if (petitions.length > 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'none';
+                
+                petitions.forEach(petition => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${petition.ticket_id}</td>
+                        <td>${petition.title}</td>
+                        <td>${petition.category}</td>
+                        <td>${petition.department}</td>
+                        <td>${new Date(petition.created_at).toLocaleDateString()}</td>
+                        <td><span class="status status-${petition.status.replace('_', '-')}">${petition.status.replace('_', ' ').replace(/\w\S*/g, function(txt) {
+                            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                        })}</span></td>
+                        <td>
+                            <button class="btn btn-outline" onclick="viewDetails('${petition.ticket_id}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+            }
+        }
+
+        // View petition details
+        async function viewDetails(ticketId) {
+            try {
+                console.log('🔍 Loading petition details for:', ticketId);
+                
+                const response = await fetch(`/api/petitions/track/${ticketId}`, {
+                    credentials: 'include'
+                });
+                
+                console.log('📥 Response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Petition data received:', data);
+                    showPetitionDetails(data.petition);
+                } else {
+                    const errorData = await response.json();
+                    console.error('❌ API Error:', errorData);
+                    throw new Error(errorData.error || 'Failed to load petition details');
+                }
+            } catch (error) {
+                console.error('❌ Error loading petition details:', error);
+                alert(`Error loading petition details: ${error.message}\n\nPlease try again or contact support.`);
+            }
+        }
+        
+        // Show petition details
+        function showPetitionDetails(petition) {
+            const detailsContent = document.getElementById('details-content');
+            detailsContent.innerHTML = `
+                <div class="detail-row">
+                    <div class="detail-label">Title:</div>
+                    <div>${petition.title}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Description:</div>
+                    <div>${petition.description}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Category:</div>
+                    <div>${petition.category}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Department:</div>
+                    <div>${petition.department}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Location:</div>
+                    <div>${petition.location}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Urgency:</div>
+                    <div>${petition.urgency}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status:</div>
+                    <div><span class="status status-${petition.status.replace('_', '-')}">${petition.status.replace('_', ' ').replace(/\w\S*/g, function(txt) {
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    })}</span></div>
+                </div>
+                ${petition.status === 'rejected' && petition.rejection_reason ? `
+                <div class="detail-row rejection-reason-row">
+                    <div class="detail-label">Rejection Reason:</div>
+                    <div class="rejection-reason-box">${petition.rejection_reason}</div>
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <div class="detail-label">Submitted:</div>
+                    <div>${new Date(petition.created_at).toLocaleString()}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Last Updated:</div>
+                    <div>${new Date(petition.updated_at).toLocaleString()}</div>
+                </div>
+            `;
+            
+            document.getElementById('petition-details').style.display = 'block';
+        }
+        
+        // Close details
+        function closeDetails() {
+            document.getElementById('petition-details').style.display = 'none';
+        }
+        
+        // Form submission
+        document.getElementById('search-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const searchData = {
+                    ticket_id: document.getElementById('ticket-id').value,
+                    status: document.getElementById('status').value,
+                    category: document.getElementById('category').value,
+                    date_from: document.getElementById('date-from').value,
+                    date_to: document.getElementById('date-to').value
+                };
+                
+                console.log('Search data:', searchData);
+                await searchPetitions(searchData);
+            } catch (error) {
+                console.error('Search form error:', error);
+                alert('Error searching petitions. Please try again.');
+            }
+        });
+        
+        // Logout function
+        async function logout() {
+            try {
+                await fetch('/logout', {
+                    credentials: 'include'
+                });
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!await checkAuth()) {
+                return;
+            }
+            await loadUserProfile();
+            
+            // Load all petitions initially
+            await searchPetitions({});
+        });
+    </script>
+</body>
+</html>
