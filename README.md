@@ -94,5 +94,5 @@ This project is for educational purposes.
 ---
 
 ## Author
-- Developed by [Your Name]
-- [Your Email]
+- Developed by Jayasuriya B
+- suriyaganesh301@gmail.com
